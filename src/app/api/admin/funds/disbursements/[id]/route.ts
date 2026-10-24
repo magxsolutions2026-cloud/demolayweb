@@ -1,8 +1,7 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { logFundActivity } from '@/lib/fundActivityLog';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import { parseAmount, parseDateOnly, sanitizeText, sanitizeTitle } from '@/lib/fundsValidation';
 
 function sanitizeCategory(v: unknown): string {
@@ -34,11 +33,11 @@ export async function PUT(request: Request, ctx: { params: Promise<{ id: string 
 
   const purpose = sanitizeText(body.purpose) || null;
 
-  const [res] = await pool.execute<ResultSetHeader>(
+  const { rowCount } = await execute(
     `UPDATE disbursements SET title=?, amount=?, category=?, disbursement_date=?, purpose=? WHERE id=?`,
     [title, amount, category, disbursementDate, purpose, id],
   );
-  if (!res.affectedRows) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!rowCount) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   await logFundActivity('disbursement', `Updated disbursement: ${title}`);
   return NextResponse.json({ ok: true });
@@ -51,8 +50,8 @@ export async function DELETE(request: Request, ctx: { params: Promise<{ id: stri
   if (!Number.isFinite(id)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
   const prev = await query('SELECT title FROM disbursements WHERE id = ?', [id]);
-  const [del] = await pool.execute<ResultSetHeader>('DELETE FROM disbursements WHERE id = ?', [id]);
-  if (!del.affectedRows) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  const { rowCount: del } = await execute('DELETE FROM disbursements WHERE id = ?', [id]);
+  if (!del) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const title = Array.isArray(prev) && prev[0] ? String((prev[0] as { title: string }).title) : String(id);
   await logFundActivity('disbursement', `Removed disbursement: ${title}`);

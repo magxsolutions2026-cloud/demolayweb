@@ -1,7 +1,6 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { publishAdminRealtime } from '@/lib/adminRealtime';
-import { pool } from '@/lib/db';
+import { execute } from '@/lib/db';
 import { cleanEmail, isValidEmail } from '@/lib/validation';
 
 export async function POST(request: Request) {
@@ -26,8 +25,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'A valid email address is required.' }, { status: 400 });
   }
 
-  const [result] = await pool.execute<ResultSetHeader>('INSERT IGNORE INTO subscribers (email) VALUES (?)', [safeEmail]);
-  const alreadySubscribed = Number(result.affectedRows ?? 0) === 0;
+  const { rowCount } = await execute('INSERT INTO subscribers (email) VALUES (?) ON CONFLICT (email) DO NOTHING', [safeEmail]);
+  const alreadySubscribed = rowCount === 0;
 
   if (!alreadySubscribed) {
     publishAdminRealtime('subscribers');

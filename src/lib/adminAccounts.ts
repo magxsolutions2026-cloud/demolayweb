@@ -69,42 +69,6 @@ async function countQuery(sql: string, params: Array<string | number> = []) {
   return Number(rows[0]?.c ?? rows[0]?.count ?? 0);
 }
 
-async function columnExists(columnName: string) {
-  const count = await countQuery(
-    `SELECT COUNT(*) AS c
-     FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE TABLE_SCHEMA = DATABASE()
-       AND TABLE_NAME = 'admins'
-       AND COLUMN_NAME = ?`,
-    [columnName],
-  );
-  return count > 0;
-}
-
-async function indexExists(indexName: string) {
-  const count = await countQuery(
-    `SELECT COUNT(*) AS c
-     FROM INFORMATION_SCHEMA.STATISTICS
-     WHERE TABLE_SCHEMA = DATABASE()
-       AND TABLE_NAME = 'admins'
-       AND INDEX_NAME = ?`,
-    [indexName],
-  );
-  return count > 0;
-}
-
-async function hasUniqueEmailIndex() {
-  const count = await countQuery(
-    `SELECT COUNT(*) AS c
-     FROM INFORMATION_SCHEMA.STATISTICS
-     WHERE TABLE_SCHEMA = DATABASE()
-       AND TABLE_NAME = 'admins'
-       AND COLUMN_NAME = 'email'
-       AND NON_UNIQUE = 0`,
-  );
-  return count > 0;
-}
-
 function normalizeRole(value: unknown): AdminAccountRole {
   const text = cleanText(value, 64).toLowerCase();
   if (!text) return DEFAULT_ADMIN_ACCOUNT_ROLE;
@@ -116,89 +80,6 @@ function normalizeStatus(value: unknown): AdminAccountStatus {
   const text = cleanText(value, 32).toLowerCase();
   const matched = ADMIN_ACCOUNT_STATUSES.find((status) => status.toLowerCase() === text);
   return matched ?? DEFAULT_ADMIN_ACCOUNT_STATUS;
-}
-
-async function ensureAdminAccountConstraints() {
-  if (!(await hasUniqueEmailIndex()) && !(await indexExists('admins_email_unique'))) {
-    await query('ALTER TABLE admins ADD UNIQUE KEY admins_email_unique (email)');
-  }
-}
-
-async function normalizeLegacyAdminRows() {
-  await query(
-    `UPDATE admins
-     SET name = COALESCE(NULLIF(TRIM(name), ''), username)`,
-  );
-
-  await query(
-    `UPDATE admins
-     SET email = CASE
-       WHEN email IS NULL OR TRIM(email) = '' THEN
-         CASE
-           WHEN username REGEXP '^[^[:space:]@]+@[^[:space:]@]+\\.[^[:space:]@]+$' THEN LOWER(TRIM(username))
-           ELSE CONCAT('admin-', id, '@admin.local')
-         END
-       ELSE LOWER(TRIM(email))
-     END`,
-  );
-
-  await query(
-    `UPDATE admins
-     SET role = CASE
-       WHEN role IN ('Super Admin', 'Finance Admin', 'Communications Admin', 'Membership Admin') THEN role
-       ELSE '${DEFAULT_ADMIN_ACCOUNT_ROLE}'
-     END`,
-  );
-
-  await query(
-    `UPDATE admins
-     SET status = ${ACTIVE_STATUS_SQL}`,
-  );
-
-  await query('ALTER TABLE admins MODIFY COLUMN name VARCHAR(160) NOT NULL');
-  await query('ALTER TABLE admins MODIFY COLUMN email VARCHAR(255) NOT NULL');
-  await query(
-    `ALTER TABLE admins
-     MODIFY COLUMN role VARCHAR(64) NOT NULL DEFAULT '${DEFAULT_ADMIN_ACCOUNT_ROLE}'`,
-  );
-  await query(
-    `ALTER TABLE admins
-     MODIFY COLUMN status VARCHAR(16) NOT NULL DEFAULT '${DEFAULT_ADMIN_ACCOUNT_STATUS}'`,
-  );
-}
-
-export async function migrateAdminAccountsIfNeeded() {
-  if (!(await columnExists('name'))) {
-    await query('ALTER TABLE admins ADD COLUMN name VARCHAR(160) NULL AFTER username');
-  }
-
-  if (!(await columnExists('email'))) {
-    await query('ALTER TABLE admins ADD COLUMN email VARCHAR(255) NULL AFTER name');
-  }
-
-  if (!(await columnExists('role'))) {
-    await query(
-      `ALTER TABLE admins
-       ADD COLUMN role VARCHAR(64) NOT NULL DEFAULT '${DEFAULT_ADMIN_ACCOUNT_ROLE}' AFTER email`,
-    );
-  }
-
-  if (!(await columnExists('status'))) {
-    await query(
-      `ALTER TABLE admins
-       ADD COLUMN status VARCHAR(16) NOT NULL DEFAULT '${DEFAULT_ADMIN_ACCOUNT_STATUS}' AFTER role`,
-    );
-  }
-
-  if (!(await columnExists('updated_at'))) {
-    await query(
-      `ALTER TABLE admins
-       ADD COLUMN updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER created_at`,
-    );
-  }
-
-  await normalizeLegacyAdminRows();
-  await ensureAdminAccountConstraints();
 }
 
 async function ensureEmailAvailable(email: string, excludeId?: number) {
@@ -287,18 +168,15 @@ function preparePassword(passwordValue: unknown, required: boolean) {
 }
 
 export async function listAdminAccounts() {
-  await migrateAdminAccountsIfNeeded();
   return query<AdminAccountRow>(`${ADMIN_SELECT_BASE} ORDER BY created_at DESC, id DESC`);
 }
 
 export async function getAdminAccountById(id: number) {
-  await migrateAdminAccountsIfNeeded();
   const rows = await query<AdminAccountRow>(`${ADMIN_SELECT_BASE} WHERE id = ? LIMIT 1`, [id]);
   return rows[0] ?? null;
 }
 
 export async function findAdminAccountByLogin(identifier: string) {
-  await migrateAdminAccountsIfNeeded();
   const rows = await query<AdminAccountAuthRow>(
     `
       SELECT
@@ -333,7 +211,6 @@ export async function createAdminAccount(input: {
   status?: unknown;
   username?: unknown;
 }) {
-  await migrateAdminAccountsIfNeeded();
 
   const { name, email, role, status, username } = prepareBasePayload(input);
   const password = preparePassword(input.password, true);
@@ -364,7 +241,6 @@ export async function updateAdminAccount(
   },
   currentAdminId?: number | null,
 ) {
-  await migrateAdminAccountsIfNeeded();
 
   const existing = await getAdminAccountById(id);
   if (!existing) {
@@ -409,7 +285,6 @@ export async function updateAdminAccount(
 }
 
 export async function deleteAdminAccount(id: number, currentAdminId?: number | null) {
-  await migrateAdminAccountsIfNeeded();
 
   const existing = await getAdminAccountById(id);
   if (!existing) {

@@ -1,8 +1,7 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { logFundActivity } from '@/lib/fundActivityLog';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import {
   parseAmount,
   parseDateOnly,
@@ -48,12 +47,12 @@ export async function PUT(request: Request, ctx: { params: Promise<{ id: string 
     campaignId = cid;
   }
 
-  const [res] = await pool.execute<ResultSetHeader>(
+  const { rowCount } = await execute(
     `UPDATE fund_sources SET title=?, amount=?, source_type=?, source_specify=?, source_date=?, description=?, campaign_id=?
      WHERE id=?`,
     [title, amount, sourceType, sourceSpecify, sourceDate, description, campaignId, id],
   );
-  if (!res.affectedRows) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!rowCount) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   await logFundActivity('fund_source', `Updated fund source: ${title}`);
   return NextResponse.json({ ok: true });
@@ -66,8 +65,8 @@ export async function DELETE(request: Request, ctx: { params: Promise<{ id: stri
   if (!Number.isFinite(id)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
   const prev = await query('SELECT title FROM fund_sources WHERE id = ?', [id]);
-  const [del] = await pool.execute<ResultSetHeader>('DELETE FROM fund_sources WHERE id = ?', [id]);
-  if (!del.affectedRows) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  const { rowCount: del } = await execute('DELETE FROM fund_sources WHERE id = ?', [id]);
+  if (!del) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const title = Array.isArray(prev) && prev[0] ? String((prev[0] as { title: string }).title) : String(id);
   await logFundActivity('fund_source', `Removed fund source: ${title}`);

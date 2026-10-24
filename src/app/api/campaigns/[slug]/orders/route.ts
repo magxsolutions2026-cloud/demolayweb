@@ -1,8 +1,7 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { publishAdminRealtime } from '@/lib/adminRealtime';
 import { logFundActivity } from '@/lib/fundActivityLog';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import {
   looksLikeEmail,
   parseAmount,
@@ -88,19 +87,16 @@ export async function POST(request: Request, ctx: { params: Promise<{ slug: stri
   }
 
   const totalAmount = Math.round(unitPrice * quantity * 100) / 100;
-  const connection = await pool.getConnection();
 
   try {
-    await connection.beginTransaction();
-
-    const [result] = await connection.execute<ResultSetHeader>(
+    // Single-statement insert — Postgres auto-commits it atomically, no explicit transaction needed.
+    const { rows: inserted } = await execute(
       `INSERT INTO campaign_orders
        (campaign_id, brother_name, email, phone, shirt_size, quantity, unit_price, total_amount, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       RETURNING id`,
       [campaign.id, brotherName, email, phone, shirtSize, quantity, unitPrice, totalAmount, notes],
     );
-
-    await connection.commit();
 
     await logFundActivity(
       'order',
@@ -110,15 +106,12 @@ export async function POST(request: Request, ctx: { params: Promise<{ slug: stri
 
     return NextResponse.json({
       success: true,
-      orderId: Number(result.insertId ?? 0),
+      orderId: Number(inserted[0]?.id ?? 0),
       totalAmount,
       message: `Your order for ${campaign.name} has been recorded.`,
     });
   } catch (error) {
-    await connection.rollback();
     console.error('[api/campaigns/[slug]/orders] POST failed:', error);
     return NextResponse.json({ error: 'Could not record the order.' }, { status: 500 });
-  } finally {
-    connection.release();
   }
 }

@@ -1,9 +1,8 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { parseCampaignImageUrls, serializeCampaignImageUrls } from '@/lib/campaignImages';
 import { logFundActivity } from '@/lib/fundActivityLog';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import {
   parseAmount,
   parseCampaignSizeOptions,
@@ -91,10 +90,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Valid shirt price required for T-shirt campaigns' }, { status: 400 });
   }
 
-  const [ins] = await pool.execute<ResultSetHeader>(
+  const { rows: inserted } = await execute(
     `INSERT INTO campaigns
       (name, slug, goal_amount, start_date, end_date, status, campaign_type, summary, description, cover_image_url, image_urls, unit_price, size_options)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     RETURNING id`,
     [
       name,
       slug,
@@ -114,5 +114,5 @@ export async function POST(request: Request) {
 
   await logFundActivity('campaign', `Created ${campaignType === 'tshirt' ? 'T-shirt' : 'fundraising'} campaign: ${name}`);
 
-  return NextResponse.json({ ok: true, id: Number(ins.insertId ?? 0) });
+  return NextResponse.json({ ok: true, id: Number(inserted[0]?.id ?? 0) });
 }

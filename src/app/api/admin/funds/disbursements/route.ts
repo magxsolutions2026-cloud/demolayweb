@@ -1,8 +1,7 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { logFundActivity } from '@/lib/fundActivityLog';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import { parseAmount, parseDateOnly, sanitizeText, sanitizeTitle } from '@/lib/fundsValidation';
 
 const CAT_MAX = 64;
@@ -56,12 +55,13 @@ export async function POST(request: Request) {
 
   const purpose = sanitizeText(body.purpose) || null;
 
-  const [ins] = await pool.execute<ResultSetHeader>(
-    `INSERT INTO disbursements (title, amount, category, disbursement_date, purpose) VALUES (?, ?, ?, ?, ?)`,
+  const { rows: inserted } = await execute(
+    `INSERT INTO disbursements (title, amount, category, disbursement_date, purpose) VALUES (?, ?, ?, ?, ?)
+     RETURNING id`,
     [title, amount, category, disbursementDate, purpose],
   );
 
   await logFundActivity('disbursement', `Recorded disbursement: ${title} (${amount})`);
 
-  return NextResponse.json({ ok: true, id: Number(ins.insertId ?? 0) });
+  return NextResponse.json({ ok: true, id: Number(inserted[0]?.id ?? 0) });
 }

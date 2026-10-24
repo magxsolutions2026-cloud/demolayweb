@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import type { ResultSetHeader } from 'mysql2';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import { parseNewsImageUrls, serializeNewsImageUrls } from '@/lib/newsImages';
 import { requireAdmin } from '@/lib/auth';
 import { NewsletterMailError, sendNewsPublishedEmail } from '@/lib/newsletterEmail';
@@ -59,12 +58,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Slug generation failed' }, { status: 400 });
   }
 
-  const [result] = await pool.execute<ResultSetHeader>(
-    'INSERT INTO news (title, slug, summary, content, image_urls, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+  const { rows: inserted } = await execute(
+    'INSERT INTO news (title, slug, summary, content, image_urls, is_published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id',
     [title, safeSlug, summary || '', content || '', imageUrls, is_published ? 1 : 0, published_at || new Date()]
   );
 
-  const recordId = Number(result.insertId || 0);
+  const recordId = Number(inserted[0]?.id || 0);
   let mailSent = false;
   let mailError: string | null = null;
 

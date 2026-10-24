@@ -90,7 +90,7 @@ async function fetchCampaignsForFeed() {
        WHERE campaign_type = 'tshirt'
          AND status = 'active'
          AND slug IS NOT NULL
-         AND CURDATE() BETWEEN start_date AND end_date
+         AND CURRENT_DATE BETWEEN start_date AND end_date
        ORDER BY created_at DESC, id DESC`,
     );
   } catch {

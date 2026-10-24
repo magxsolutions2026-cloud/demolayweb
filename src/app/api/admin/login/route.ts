@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error('[api/admin/login] POST failed:', err);
     return NextResponse.json(
-      { error: 'Database unavailable. Check MySQL is running and .env credentials are correct.' },
+      { error: 'Database unavailable. Check DATABASE_URL (Supabase) and environment variables.' },
       { status: 503 },
     );
   }

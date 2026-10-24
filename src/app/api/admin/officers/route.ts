@@ -3,7 +3,7 @@ import { query } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { cleanText } from '@/lib/validation';
 import { clampOfficerFraming } from '@/lib/officerPhoto';
-import { listOfficersOrderedByName, migrateOfficersFramingIfNeeded } from '@/lib/officersDb';
+import { listOfficersOrderedByName } from '@/lib/officersDb';
 
 export async function GET(request: Request) {
   await requireAdmin(request);
@@ -13,7 +13,6 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   await requireAdmin(request);
-  await migrateOfficersFramingIfNeeded();
   const body = await request.json();
   const name = cleanText(body.name, 255);
   const position = cleanText(body.position, 255);

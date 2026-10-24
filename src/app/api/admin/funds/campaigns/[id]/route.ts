@@ -1,9 +1,8 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { parseCampaignImageUrls, serializeCampaignImageUrls } from '@/lib/campaignImages';
 import { logFundActivity } from '@/lib/fundActivityLog';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import {
   parseAmount,
   parseCampaignSizeOptions,
@@ -147,7 +146,7 @@ export async function PUT(request: Request, ctx: { params: Promise<{ id: string 
     return NextResponse.json({ error: 'Valid shirt price required for T-shirt campaigns' }, { status: 400 });
   }
 
-  const [res] = await pool.execute<ResultSetHeader>(
+  const { rowCount: updated } = await execute(
     `UPDATE campaigns
      SET name=?, slug=?, goal_amount=?, start_date=?, end_date=?, status=?, campaign_type=?, summary=?, description=?, cover_image_url=?, image_urls=?, unit_price=?, size_options=?
      WHERE id=?`,
@@ -168,7 +167,7 @@ export async function PUT(request: Request, ctx: { params: Promise<{ id: string 
       id,
     ],
   );
-  if (!res.affectedRows) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   await logFundActivity('campaign', `Updated ${campaignType === 'tshirt' ? 'T-shirt' : 'fundraising'} campaign: ${name}`);
   return NextResponse.json({ ok: true });
@@ -190,8 +189,8 @@ export async function DELETE(request: Request, ctx: { params: Promise<{ id: stri
   }
 
   const prev = await query('SELECT name FROM campaigns WHERE id = ?', [id]);
-  const [res] = await pool.execute<ResultSetHeader>('DELETE FROM campaigns WHERE id = ?', [id]);
-  if (!res.affectedRows) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  const { rowCount: removed } = await execute('DELETE FROM campaigns WHERE id = ?', [id]);
+  if (!removed) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const name = Array.isArray(prev) && prev[0] ? String((prev[0] as { name: string }).name) : String(id);
   await logFundActivity('campaign', `Removed campaign: ${name}`);

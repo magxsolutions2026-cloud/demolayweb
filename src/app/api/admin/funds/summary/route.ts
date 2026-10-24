@@ -25,28 +25,28 @@ export async function GET(request: Request) {
 
     const [campRows] = (await query(
       `SELECT COUNT(*) as c FROM campaigns 
-       WHERE status = 'active' AND CURDATE() BETWEEN start_date AND end_date`,
+       WHERE status = 'active' AND CURRENT_DATE BETWEEN start_date AND end_date`,
     )) as Row[];
     const activeCampaigns = Number(campRows?.c ?? 0);
 
     const raisedByMonth = (await query(
-      `SELECT DATE_FORMAT(source_date, '%Y-%m') as ym, COALESCE(SUM(amount),0) as total
+      `SELECT to_char(source_date, 'YYYY-MM') as ym, COALESCE(SUM(amount),0) as total
        FROM fund_sources
-       WHERE source_date >= DATE_SUB(CURDATE(), INTERVAL 14 MONTH)
+       WHERE source_date >= CURRENT_DATE - INTERVAL '14 months'
        GROUP BY ym ORDER BY ym`,
     )) as Array<{ ym: string; total: number }>;
 
     const orderByMonth = (await query(
-      `SELECT DATE_FORMAT(created_at, '%Y-%m') as ym, COALESCE(SUM(total_amount),0) as total
+      `SELECT to_char(created_at, 'YYYY-MM') as ym, COALESCE(SUM(total_amount),0) as total
        FROM campaign_orders
-       WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 14 MONTH)
+       WHERE created_at >= CURRENT_DATE - INTERVAL '14 months'
        GROUP BY ym ORDER BY ym`,
     )) as Array<{ ym: string; total: number }>;
 
     const disbByMonth = (await query(
-      `SELECT DATE_FORMAT(disbursement_date, '%Y-%m') as ym, COALESCE(SUM(amount),0) as total
+      `SELECT to_char(disbursement_date, 'YYYY-MM') as ym, COALESCE(SUM(amount),0) as total
        FROM disbursements
-       WHERE disbursement_date >= DATE_SUB(CURDATE(), INTERVAL 14 MONTH)
+       WHERE disbursement_date >= CURRENT_DATE - INTERVAL '14 months'
        GROUP BY ym ORDER BY ym`,
     )) as Array<{ ym: string; total: number }>;
 

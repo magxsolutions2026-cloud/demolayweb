@@ -3,11 +3,9 @@ import { query } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
 import { cleanText } from '@/lib/validation';
 import { clampOfficerFraming } from '@/lib/officerPhoto';
-import { migrateOfficersFramingIfNeeded } from '@/lib/officersDb';
 
 export async function PUT(request: Request, context: { params: Promise<{ id: string }>; }) {
   await requireAdmin(request);
-  await migrateOfficersFramingIfNeeded();
   const { id } = await context.params;
   const recordId = Number(id);
   if (!recordId) {

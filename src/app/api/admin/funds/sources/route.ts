@@ -1,8 +1,7 @@
-import type { ResultSetHeader } from 'mysql2';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { logFundActivity } from '@/lib/fundActivityLog';
-import { pool, query } from '@/lib/db';
+import { execute, query } from '@/lib/db';
 import {
   parseAmount,
   parseDateOnly,
@@ -70,12 +69,13 @@ export async function POST(request: Request) {
     campaignId = cid;
   }
 
-  const [ins] = await pool.execute<ResultSetHeader>(
+  const { rows: inserted } = await execute(
     `INSERT INTO fund_sources (title, amount, source_type, source_specify, source_date, description, campaign_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     RETURNING id`,
     [title, amount, sourceType, sourceSpecify, sourceDate, description, campaignId],
   );
-  const id = Number(ins.insertId ?? 0);
+  const id = Number(inserted[0]?.id ?? 0);
 
   await logFundActivity('fund_source', `Added fund source: ${title} (${amount})`);
 
