@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>T-Shirt Fundraising Campaign Feature</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+        color: #111;
+        margin: 2.2cm;
+      }
+      h1, h2, h3 {
+        color: #5f1422;
+      }
+      h1 {
+        font-size: 24pt;
+        margin-bottom: 0.2cm;
+      }
+      h2 {
+        font-size: 16pt;
+        margin-top: 0.8cm;
+      }
+      h3 {
+        font-size: 12pt;
+        margin-top: 0.5cm;
+      }
+      p, li {
+        font-size: 11pt;
+      }
+      code {
+        font-family: "Courier New", monospace;
+        background: #f4f1eb;
+        padding: 0 3px;
+      }
+      ul, ol {
+        margin-top: 0.15cm;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>T-Shirt Fundraising Campaign Feature</h1>
+    <p>
+      This feature adds public T-shirt fundraising campaigns to the chapter feed and records every submitted order for admin review.
+    </p>
+
+    <h2>Public Flow</h2>
+    <ol>
+      <li>An admin creates a campaign with <code>campaign_type = tshirt</code>.</li>
+      <li>Active T-shirt campaigns automatically appear in the home page chapter feed.</li>
+      <li>Brothers can open the campaign card, review details, choose a size, set quantity, and submit an order.</li>
+      <li>The system validates the order window, size, quantity, and buyer information before saving the order.</li>
+    </ol>
+
+    <h2>Admin Flow</h2>
+    <ol>
+      <li>Admins manage campaigns from the Chapter Funds workspace.</li>
+      <li>Campaigns can now be marked as <code>general</code> or <code>tshirt</code>.</li>
+      <li>T-shirt campaigns support a public slug, feed summary, description, cover image URL, unit price, and available sizes.</li>
+      <li>The Chapter Funds workspace now includes a <strong>T-shirt orders</strong> tab with totals, size breakdown, search, filtering, and a buyer list.</li>
+    </ol>
+
+    <h2>Reporting Behavior</h2>
+    <ul>
+      <li>Campaign raised totals now include manual linked <code>fund_sources</code> and recorded <code>campaign_orders</code>.</li>
+      <li>Chapter-wide funds summary now includes T-shirt order revenue in total raised, monthly raised trend, and source distribution as <code>merchandise</code>.</li>
+    </ul>
+
+    <h2>Database Changes</h2>
+    <h3>Updated <code>campaigns</code> Table</h3>
+    <p>Added columns:</p>
+    <ul>
+      <li><code>slug</code></li>
+      <li><code>campaign_type</code></li>
+      <li><code>summary</code></li>
+      <li><code>description</code></li>
+      <li><code>cover_image_url</code></li>
+      <li><code>unit_price</code></li>
+      <li><code>size_options</code></li>
+    </ul>
+
+    <h3>New <code>campaign_orders</code> Table</h3>
+    <p>Stores campaign reference, brother name, email, phone, shirt size, quantity, price snapshot, total amount, notes, and timestamp.</p>
+
+    <h2>Key Routes</h2>
+    <h3>Public</h3>
+    <ul>
+      <li><code>POST /api/campaigns/[slug]/orders</code></li>
+    </ul>
+
+    <h3>Admin</h3>
+    <ul>
+      <li><code>GET /api/admin/funds/campaigns</code></li>
+      <li><code>POST /api/admin/funds/campaigns</code></li>
+      <li><code>GET /api/admin/funds/campaigns/[id]</code></li>
+      <li><code>PUT /api/admin/funds/campaigns/[id]</code></li>
+      <li><code>DELETE /api/admin/funds/campaigns/[id]</code></li>
+      <li><code>GET /api/admin/funds/orders</code></li>
+      <li><code>GET /api/admin/funds/summary</code></li>
+    </ul>
+
+    <h2>Setup</h2>
+    <ol>
+      <li>Run <code>db-migration-funds.sql</code>.</li>
+      <li>Run <code>db-migration-tshirt-campaign-orders.sql</code>.</li>
+      <li>Optionally run <code>db-seed-funds.sql</code> for sample data.</li>
+    </ol>
+
+    <h2>Notes</h2>
+    <ul>
+      <li>T-shirt campaigns only accept orders while the campaign is active and within its start and end dates.</li>
+      <li>Campaigns with recorded orders cannot be deleted from the admin UI.</li>
+      <li>Validation passed with <code>./node_modules/.bin/eslint</code> and <code>./node_modules/.bin/tsc --noEmit</code>.</li>
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Officer photo placeholder">
+  <rect width="800" height="600" fill="#1e293b"/>
+  <circle cx="400" cy="220" r="90" fill="#475569"/>
+  <ellipse cx="400" cy="420" rx="160" ry="190" fill="#475569"/>
+</svg>
