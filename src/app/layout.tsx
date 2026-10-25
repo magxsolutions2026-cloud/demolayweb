@@ -23,6 +23,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("🚀 RootLayout loading... check this in Browser Console!");
   return (
     <html
       lang="en"
