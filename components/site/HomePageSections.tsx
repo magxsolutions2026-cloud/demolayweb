@@ -5,14 +5,7 @@ import { NewsletterSubscribeForm } from '@/components/site/NewsletterSubscribeFo
 import type { FeedItem } from '@/lib/homeFeed';
 import { LODGE_ADDRESS, googleMapsLodgeUrl, googleStreetViewOpenUrl } from '@/lib/lodgeLocation';
 
-export interface HomeHeroContent {
-  title: string;
-  subtitle: string;
-  cta?: string;
-}
-
 interface HomePageSectionsProps {
-  hero: HomeHeroContent;
   feedItems: FeedItem[];
 }
 
