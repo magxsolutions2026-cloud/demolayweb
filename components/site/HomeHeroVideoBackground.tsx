@@ -10,9 +10,9 @@ const EDGE_EPSILON = 0.04;
 const CROSSFADE_MS = 260;
 const HERO_ORBIT_EXTRA_VIEWPORTS = 0.35;
 const HERO_VIDEO_FRAME_CLASS_NAME =
-  'absolute inset-0 scale-[0.92] translate-y-3 drop-shadow-[0_32px_70px_rgba(0,0,0,0.88)] md:scale-[0.86] md:translate-y-5 md:drop-shadow-[0_42px_96px_rgba(0,0,0,0.9)]';
+  'absolute inset-0 scale-100 drop-shadow-[0_32px_70px_rgba(0,0,0,0.88)] md:scale-[0.86] md:translate-y-5 md:drop-shadow-[0_42px_96px_rgba(0,0,0,0.9)]';
 const HERO_VIDEO_CLASS_NAME =
-  `${HERO_VIDEO_FRAME_CLASS_NAME} h-full w-full object-contain object-center transition-opacity duration-300`;
+  `${HERO_VIDEO_FRAME_CLASS_NAME} h-full w-full object-cover object-center transition-opacity duration-300 md:object-contain`;
 
 type ScrollDirection = 'down' | 'up';
 type VideoLayer = 'forward' | 'reverse';
