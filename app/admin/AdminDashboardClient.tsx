@@ -121,6 +121,7 @@ function DashboardInner({
   const [listLoading, setListLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [selectedPetitioners, setSelectedPetitioners] = useState<number[]>([]);
   const [officerUploading, setOfficerUploading] = useState(false);
   const [officerUploadPreview, setOfficerUploadPreview] = useState('');
   const [newsUploadingCurrent, setNewsUploadingCurrent] = useState(0);
@@ -696,23 +697,64 @@ function DashboardInner({
     }
   };
 
-  const runDelete = async () => {
-    if (!pendingDelete) return;
+  const handleBulkApprove = async () => {
+    if (selectedPetitioners.length === 0) return;
+    setModalSaving(true);
+    try {
+      const promises = selectedPetitioners.map(id =>
+        fetch('/api/admin/petitioners', {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, status: 'Approved' }),
+        })
+      );
+      const results = await Promise.all(promises);
+      if (results.some(r => !r.ok)) {
+        throw new Error('Some requests failed');
+      }
+      setSelectedPetitioners([]);
+      await fetchAll();
+      toast('success', `Successfully approved ${selectedPetitioners.length} petitioners.`);
+    } catch (err) {
+      toast('error', 'Could not approve all selected petitioners.');
+    } finally {
+      setModalSaving(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedPetitioners.length === 0) return;
     setDeleteLoading(true);
     try {
-      let path = '';
-      if (pendingDelete.kind === 'event') path = `/api/admin/events/${pendingDelete.id}`;
-      if (pendingDelete.kind === 'officer') path = `/api/admin/officers/${pendingDelete.id}`;
-      if (pendingDelete.kind === 'news') path = `/api/admin/news/${pendingDelete.id}`;
-      const r = await fetch(path, { method: 'DELETE', credentials: 'include' });
-      if (!r.ok) throw new Error('Delete failed');
-      setPendingDelete(null);
+      const promises = selectedPetitioners.map(id =>
+        fetch(`/api/admin/petitioners/${id}`, { method: 'DELETE', credentials: 'include' })
+      );
+      const results = await Promise.all(promises);
+      if (results.some(r => !r.ok)) {
+        throw new Error('Some deletions failed');
+      }
+      setSelectedPetitioners([]);
       await fetchAll();
-      toast('success', 'Deleted.');
-    } catch {
-      toast('error', 'Could not delete.');
+      toast('success', 'Deleted selected petitioners.');
+    } catch (err) {
+      toast('error', 'Could not delete selected items.');
     } finally {
       setDeleteLoading(false);
+    }
+  };
+
+  const togglePetitionerSelection = (id: number) => {
+    setSelectedPetitioners(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAllPetitioners = () => {
+    if (selectedPetitioners.length === chapterPetitioners.length) {
+      setSelectedPetitioners([]);
+    } else {
+      setSelectedPetitioners(chapterPetitioners.map(p => p.id));
     }
   };
 
@@ -1104,6 +1146,11 @@ function DashboardInner({
                               className="text-foreground/80 hover:text-emerald-200 inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold transition duration-200 hover:scale-[1.02]"
                               onClick={async () => {
                                 try {
+                                  const originalPetitioners = [...petitioners];
+                                  setPetitioners(prev =>
+                                    prev.map(p => p.id === applicant.id ? { ...p, status: 'Approved' } : p)
+                                  );
+
                                   const r = await fetch('/api/admin/petitioners', {
                                     method: 'PUT',
                                     credentials: 'include',
@@ -1112,6 +1159,7 @@ function DashboardInner({
                                   });
                                   const payload = await r.json().catch(() => null);
                                   if (!r.ok) {
+                                    setPetitioners(originalPetitioners);
                                     throw new Error(payload?.error || 'Could not update status.');
                                   }
                                   await fetchAll();
@@ -1134,6 +1182,11 @@ function DashboardInner({
                               className="text-foreground/80 hover:text-rose-200 inline-flex items-center gap-1 rounded-lg border border-rose-500/35 bg-rose-500/10 px-3 py-2 text-xs font-semibold transition duration-200 hover:scale-[1.02]"
                               onClick={async () => {
                                 try {
+                                  const originalPetitioners = [...petitioners];
+                                  setPetitioners(prev =>
+                                    prev.map(p => p.id === applicant.id ? { ...p, status: 'Declined' } : p)
+                                  );
+
                                   const r = await fetch('/api/admin/petitioners', {
                                     method: 'PUT',
                                     credentials: 'include',
@@ -1142,6 +1195,7 @@ function DashboardInner({
                                   });
                                   const payload = await r.json().catch(() => null);
                                   if (!r.ok) {
+                                    setPetitioners(originalPetitioners);
                                     throw new Error(payload?.error || 'Could not update status.');
                                   }
                                   await fetchAll();

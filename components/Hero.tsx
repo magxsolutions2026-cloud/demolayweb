@@ -12,9 +12,61 @@ interface ParticleSpec {
   delay: number;
 }
 
+const MagneticButton = ({ children, className, ...props }: any) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { clientX, clientY, currentTarget } = e;
+    const { left, top, width, height } = currentTarget.getBoundingClientRect();
+    const x = (clientX - (left + width / 2)) * 0.3;
+    const y = (clientY - (top + height / 2)) * 0.3;
+    setPosition({ x, y });
+  };
+
+  const handleMouseLeave = () => setPosition({ x: 0, y: 0 });
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+      className="relative inline-block"
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const SplitText = ({ text, className, delay = 0 }: { text: string, className?: string, delay?: number }) => {
+  const letters = text.split("");
+  return (
+    <span className={className}>
+      {letters.map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.5,
+            delay: delay + (i * 0.03),
+            ease: [0.215, 0.61, 0.355, 1]
+          }}
+          className="inline-block"
+        >
+          {char === " " ? " " : char}
+        </motion.span>
+      ))}
+    </span>
+  );
+};
+
 const Hero: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
+  const [glowPosition, setGlowPosition] = useState({ x: 0, y: 0 });
+
   const particles: ParticleSpec[] = Array.from({ length: 50 }, (_, i) => {
     const base = Math.abs(Math.sin(i * 12.9898));
     const offset = Math.abs(Math.sin((i + 1) * 8.347));
@@ -39,6 +91,12 @@ const Hero: React.FC = () => {
     const x = (clientX - left - width / 2) / width;
     const y = (clientY - top - height / 2) / height;
     setMousePosition({ x, y });
+
+    // Set raw coordinates for the glow effect
+    setGlowPosition({
+      x: clientX - left,
+      y: clientY - top,
+    });
   };
 
   return (
@@ -49,8 +107,15 @@ const Hero: React.FC = () => {
     >
       {/* Background overlays */}
       <div className="hero-bg-overlay" />
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle 600px at ${glowPosition.x}px ${glowPosition.y}px, rgba(255, 215, 0, 0.07), transparent 80%)`,
+          zIndex: 1
+        }}
+      />
       <div className="hero-glow" />
-      <motion.div 
+      <motion.div
         className="absolute inset-0 bg-gradient-to-br from-[rgba(14,16,36,0.9)] via-[rgba(10,11,27,0.8)] to-[rgba(4,6,10,0.92)]"
         style={{
           y: scrollY * 0.28,
@@ -115,13 +180,14 @@ const Hero: React.FC = () => {
 
         {/* Main heading with gradient text */}
         <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-tight"
           style={{ letterSpacing: '0.015em' }}
         >
-          T. De Leon <span className="text-[var(--secondary-color)]">Chapter No. 47</span>
+          <SplitText text="T. De Leon " className="text-white" />
+          <SplitText text="Chapter No. 47" className="text-[var(--secondary-color)]" delay={0.5} />
         </motion.h1>
 
         {/* Subheading with enhanced typography */}
@@ -151,22 +217,26 @@ const Hero: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
         >
-          <motion.a
-            href="#join"
-            whileHover={{ scale: 1.04, y: -1 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-8 py-4 rounded-lg font-bold text-lg text-white shadow-[0_12px_28px_rgba(79,70,229,0.4)] bg-gradient-to-r from-[#4f46e5] to-[#7c3aed] hover:shadow-[0_14px_32px_rgba(79,70,229,0.6)] transition-all"
-          >
-            Join Us
-          </motion.a>
-          <motion.a
-            href="#events"
-            whileHover={{ scale: 1.04, y: -1 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-8 py-4 border border-[var(--secondary-color)] text-[var(--secondary-color)] rounded-lg font-bold text-lg bg-transparent hover:bg-[rgba(255,215,0,0.08)] hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all"
-          >
-            View Events
-          </motion.a>
+          <MagneticButton>
+            <motion.a
+              href="#join"
+              whileHover={{ scale: 1.04, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-8 py-4 rounded-lg font-bold text-lg text-white shadow-[0_12px_28px_rgba(79,70,229,0.4)] bg-gradient-to-r from-[#4f46e5] to-[#7c3aed] hover:shadow-[0_14px_32px_rgba(79,70,229,0.6)] transition-all block text-center"
+            >
+              Join Us
+            </motion.a>
+          </MagneticButton>
+          <MagneticButton>
+            <motion.a
+              href="#events"
+              whileHover={{ scale: 1.04, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-8 py-4 border border-[var(--secondary-color)] text-[var(--secondary-color)] rounded-lg font-bold text-lg bg-transparent hover:bg-[rgba(255,215,0,0.08)] hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] transition-all block text-center"
+            >
+              View Events
+            </motion.a>
+          </MagneticButton>
         </motion.div>
 
         {/* Trust badge */}
