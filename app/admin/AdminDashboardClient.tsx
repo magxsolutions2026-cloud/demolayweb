@@ -697,6 +697,26 @@ function DashboardInner({
     }
   };
 
+  const runDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleteLoading(true);
+    try {
+      let path = '';
+      if (pendingDelete.kind === 'event') path = `/api/admin/events/${pendingDelete.id}`;
+      if (pendingDelete.kind === 'officer') path = `/api/admin/officers/${pendingDelete.id}`;
+      if (pendingDelete.kind === 'news') path = `/api/admin/news/${pendingDelete.id}`;
+      const response = await fetch(path, { method: 'DELETE', credentials: 'include' });
+      if (!response.ok) throw new Error('Delete failed');
+      setPendingDelete(null);
+      await fetchAll();
+      toast('success', 'Deleted.');
+    } catch {
+      toast('error', 'Could not delete.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleBulkApprove = async () => {
     if (selectedPetitioners.length === 0) return;
     setModalSaving(true);
