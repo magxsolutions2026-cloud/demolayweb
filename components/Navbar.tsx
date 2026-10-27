@@ -60,7 +60,7 @@ export default function Navbar() {
           backgroundColor: scrolled ? 'rgba(12, 10, 16, 0.96)' : 'transparent',
         }}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 w-full items-center justify-between gap-4 px-4 sm:px-8 lg:px-12 xl:px-16">
           <Link href="/" className="group flex min-w-0 items-center gap-3" onClick={() => setMobileOpen(false)}>
             <Logo className="h-9 w-9 shrink-0 transition duration-300 group-hover:scale-105" priority />
             <div className="min-w-0">

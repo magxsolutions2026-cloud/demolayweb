@@ -58,11 +58,11 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
       </section>
 
       <div className="relative z-10 w-full">
-        <section id="feed" className="scroll-mt-24 px-6 py-6 md:px-10 md:py-8">
+        <section id="feed" className="scroll-mt-24 px-4 py-6 sm:px-8 md:py-8 lg:px-12 xl:px-16">
           <HomeFeed items={feedItems} />
 
           {/* Seven Cardinal Virtues card — sits below the main chapter feed */}
-          <div className="mx-auto mt-8 max-w-6xl md:mt-12">
+          <div className="mx-auto mt-8 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] md:mt-12">
             <div className="glass rounded-3xl p-6 backdrop-blur-xl md:p-8">
               <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                 <div>
@@ -95,7 +95,7 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
           </div>
 
           {/* Lodge CTA merged into the same "chapter feed" area */}
-          <div className="mx-auto mt-8 w-full max-w-6xl md:mt-12">
+          <div className="mx-auto mt-8 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] md:mt-12">
             <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gold/25 bg-[rgba(12,10,16,0.38)] shadow-lg backdrop-blur-xl">
               <div className="w-full overflow-hidden bg-gradient-to-br from-maroon/25 via-[rgba(26,20,32,0.45)] to-[rgba(10,10,10,0.5)] p-5">
                 <p className="text-gold mb-2 text-xs font-semibold uppercase tracking-[0.2em]">Lodge</p>
@@ -131,8 +131,8 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
 
         {/* Make the area behind the newsletter blend with the video backdrop */}
         <div className="bg-[rgba(10,8,16,0.15)]">
-          <section id="newsletter" className="px-6 py-4 md:px-10 md:py-6">
-            <div className="mx-auto w-full max-w-6xl rounded-3xl border border-gold/35 bg-[rgba(10,10,10,0.15)] p-8 backdrop-blur-xl">
+          <section id="newsletter" className="px-4 py-4 sm:px-8 md:py-6 lg:px-12 xl:px-16">
+            <div className="mx-auto w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] rounded-3xl border border-gold/35 bg-[rgba(10,10,10,0.15)] p-8 backdrop-blur-xl">
               <h2 className="font-serif mb-4 text-3xl font-bold text-gold md:text-4xl">Newsletter</h2>
               <p className="mb-4 text-foreground/80">Get events, announcements, and chapter milestones in your inbox.</p>
               <NewsletterSubscribeForm />

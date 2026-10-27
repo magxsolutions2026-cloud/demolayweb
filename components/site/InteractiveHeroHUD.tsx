@@ -49,7 +49,7 @@ export default function InteractiveHeroHUD() {
   return (
     <div
       onMouseMove={handleHeroMouseMove}
-      className="relative flex min-h-[100dvh] w-full flex-col justify-between overflow-hidden px-4 pb-16 pt-20 sm:px-8 sm:pb-20 sm:pt-24 lg:px-12 lg:pb-24 lg:pt-28"
+      className="relative flex min-h-[100dvh] w-full flex-col justify-between overflow-hidden px-4 pb-16 pt-20 sm:px-8 sm:pb-20 sm:pt-24 lg:px-12 lg:pb-24 lg:pt-28 xl:px-16"
     >
       {/* ======================================================== */}
       {/* 1. ARCHITECTURAL HUD CORNER RETICLES & DATA READOUTS     */}
@@ -62,7 +62,7 @@ export default function InteractiveHeroHUD() {
           y: mouseOffset.y * 6,
         }}
         transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-        className="pointer-events-none absolute left-4 top-20 z-20 flex flex-col gap-1 sm:left-8 sm:top-24 lg:left-12 lg:top-28"
+        className="pointer-events-none absolute left-4 top-20 z-20 flex flex-col gap-1 sm:left-8 sm:top-24 lg:left-12 lg:top-28 xl:left-16"
       >
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 items-center justify-center">
@@ -91,7 +91,7 @@ export default function InteractiveHeroHUD() {
           y: mouseOffset.y * 6,
         }}
         transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-        className="pointer-events-none absolute right-4 top-20 z-20 hidden flex-col items-end gap-1 sm:flex sm:right-8 sm:top-24 lg:right-12 lg:top-28"
+        className="pointer-events-none absolute right-4 top-20 z-20 hidden flex-col items-end gap-1 sm:flex sm:right-8 sm:top-24 lg:right-12 lg:top-28 xl:right-16"
       >
         <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-black/40 px-3 py-1 backdrop-blur-md">
           <Sparkles className="h-3 w-3 text-gold" />
@@ -105,11 +105,11 @@ export default function InteractiveHeroHUD() {
       </motion.div>
 
       {/* Corner Brackets [ + ] Decorative Watermarks */}
-      <div className="pointer-events-none absolute inset-x-4 top-16 z-10 flex justify-between text-gold/25 sm:inset-x-8 lg:inset-x-12" aria-hidden>
+      <div className="pointer-events-none absolute inset-x-4 top-16 z-10 flex justify-between text-gold/25 sm:inset-x-8 lg:inset-x-12 xl:inset-x-16" aria-hidden>
         <span className="font-mono text-xs">+</span>
         <span className="font-mono text-xs">+</span>
       </div>
-      <div className="pointer-events-none absolute inset-x-4 bottom-12 z-10 flex justify-between text-gold/25 sm:inset-x-8 lg:inset-x-12" aria-hidden>
+      <div className="pointer-events-none absolute inset-x-4 bottom-12 z-10 flex justify-between text-gold/25 sm:inset-x-8 lg:inset-x-12 xl:inset-x-16" aria-hidden>
         <span className="font-mono text-xs">+</span>
         <span className="font-mono text-xs">+</span>
       </div>

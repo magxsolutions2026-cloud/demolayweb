@@ -347,7 +347,7 @@ export default function HomeFeed({ items }: { items: FeedItem[] }) {
 
   return (
     <>
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px]">
         <section className="relative overflow-hidden rounded-[1.75rem] border border-gold/25 bg-[linear-gradient(180deg,rgba(26,8,14,0.45),rgba(9,8,14,0.40))] px-4 py-5 shadow-[0_24px_72px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:px-6 sm:py-6 lg:px-7">
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.16),transparent_62%)]" />
