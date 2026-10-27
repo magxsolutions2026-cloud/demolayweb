@@ -64,8 +64,8 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
           <HomeFeed items={feedItems} />
 
           {/* Seven Cardinal Virtues card — sits below the main chapter feed */}
-          <div className="mx-auto mt-4 max-w-6xl">
-            <div className="glass rounded-3xl p-6 md:p-8">
+          <div className="mx-auto mt-8 max-w-6xl md:mt-12">
+            <div className="glass rounded-3xl p-6 backdrop-blur-xl md:p-8">
               <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                 <div>
                   <p className="font-semibold uppercase tracking-[0.22em] text-gold/95 text-[0.72rem] md:text-xs">
@@ -97,9 +97,9 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
           </div>
 
           {/* Lodge CTA merged into the same "chapter feed" area */}
-          <div className="mx-auto mt-4 w-full max-w-6xl">
-            <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gold/20 bg-[rgba(12,10,16,0.65)] shadow-lg backdrop-blur-md">
-              <div className="w-full overflow-hidden bg-gradient-to-br from-maroon/40 via-[#1a1420] to-black p-5">
+          <div className="mx-auto mt-8 w-full max-w-6xl md:mt-12">
+            <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gold/25 bg-[rgba(12,10,16,0.38)] shadow-lg backdrop-blur-xl">
+              <div className="w-full overflow-hidden bg-gradient-to-br from-maroon/25 via-[rgba(26,20,32,0.45)] to-[rgba(10,10,10,0.5)] p-5">
                 <p className="text-gold mb-2 text-xs font-semibold uppercase tracking-[0.2em]">Lodge</p>
                 <h3 className="font-serif text-2xl font-bold leading-tight text-gold">Visit the lodge</h3>
               </div>

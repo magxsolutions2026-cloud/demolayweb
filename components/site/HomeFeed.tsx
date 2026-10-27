@@ -348,7 +348,7 @@ export default function HomeFeed({ items }: { items: FeedItem[] }) {
   return (
     <>
       <div className="mx-auto max-w-6xl">
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-gold/20 bg-[linear-gradient(180deg,rgba(34,10,14,0.96),rgba(9,8,14,0.96))] px-4 py-5 shadow-[0_24px_72px_rgba(0,0,0,0.42)] sm:px-6 sm:py-6 lg:px-7">
+        <section className="relative overflow-hidden rounded-[1.75rem] border border-gold/25 bg-[linear-gradient(180deg,rgba(26,8,14,0.45),rgba(9,8,14,0.40))] px-4 py-5 shadow-[0_24px_72px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:px-6 sm:py-6 lg:px-7">
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.16),transparent_62%)]" />
             <div className="absolute left-[-10%] top-10 h-56 w-56 rounded-full bg-gold/10 blur-3xl" />
@@ -775,10 +775,10 @@ function FeedCard({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.35, delay: Math.min(index * 0.05, 0.3) }}
       whileHover={{ y: -6 }}
-      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.8rem] border backdrop-blur-md ${
+      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[1.8rem] border backdrop-blur-xl ${
         isActive
-          ? 'border-gold/45 bg-[rgba(12,9,16,0.92)] shadow-[0_30px_90px_rgba(0,0,0,0.45),0_0_32px_rgba(212,175,55,0.12)]'
-          : 'border-gold/20 bg-[rgba(12,9,16,0.82)] shadow-[0_20px_60px_rgba(0,0,0,0.36)]'
+          ? 'border-gold/45 bg-[rgba(14,10,18,0.55)] shadow-[0_30px_90px_rgba(0,0,0,0.45),0_0_32px_rgba(212,175,55,0.15)]'
+          : 'border-gold/20 bg-[rgba(14,10,18,0.38)] shadow-[0_20px_60px_rgba(0,0,0,0.30)]'
       }`}
       onClick={onOpen}
       role="button"
@@ -826,10 +826,10 @@ function FeedCard({
               <div
                 className={`absolute inset-0 ${
                   isNews
-                    ? 'bg-[linear-gradient(135deg,rgba(16,16,24,1)_0%,rgba(49,16,24,1)_46%,rgba(8,8,12,1)_100%)]'
+                    ? 'bg-[linear-gradient(135deg,rgba(16,16,24,0.60)_0%,rgba(49,16,24,0.55)_46%,rgba(8,8,12,0.65)_100%)]'
                     : isEvent
-                      ? 'bg-[linear-gradient(135deg,rgba(12,16,20,1)_0%,rgba(46,22,32,1)_46%,rgba(8,8,12,1)_100%)]'
-                      : 'bg-[linear-gradient(135deg,rgba(12,16,20,1)_0%,rgba(58,22,18,1)_46%,rgba(8,8,12,1)_100%)]'
+                      ? 'bg-[linear-gradient(135deg,rgba(12,16,20,0.60)_0%,rgba(46,22,32,0.55)_46%,rgba(8,8,12,0.65)_100%)]'
+                      : 'bg-[linear-gradient(135deg,rgba(12,16,20,0.60)_0%,rgba(58,22,18,0.55)_46%,rgba(8,8,12,0.65)_100%)]'
                 }`}
               />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.18),transparent_42%)]" />

@@ -109,12 +109,15 @@ html[data-theme="light"] .cta-ghost:hover {
 .glass {
   position: relative;
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 18px rgba(115, 14, 27, 0.25);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.4),
+    0 0 18px rgba(115, 14, 27, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   overflow: hidden;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* Officers + gallery cards — smooth lift on hover */

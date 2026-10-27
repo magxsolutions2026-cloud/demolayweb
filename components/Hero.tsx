@@ -18,8 +18,8 @@ const MagneticButton = ({ children, className, ...props }: any) => {
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, currentTarget } = e;
     const { left, top, width, height } = currentTarget.getBoundingClientRect();
-    const x = (clientX - (left + width / 2)) * 0.3;
-    const y = (clientY - (top + height / 2)) * 0.3;
+    const x = (clientX - (left + width / 2)) * 0.4;
+    const y = (clientY - (top + height / 2)) * 0.4;
     setPosition({ x, y });
   };
 
@@ -30,7 +30,7 @@ const MagneticButton = ({ children, className, ...props }: any) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       animate={{ x: position.x, y: position.y }}
-      transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       className="relative inline-block"
       {...props}
     >

@@ -50,9 +50,15 @@ export default function Navbar() {
         initial={{ y: -72, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className={`site-nav fixed top-0 z-50 w-full transition-[box-shadow,background] duration-300 ${
-          scrolled ? 'site-nav-scrolled shadow-[0_12px_40px_rgba(0,0,0,0.45)]' : ''
+        className={`site-nav fixed top-0 z-50 w-full transition-all duration-500 ${
+          scrolled
+            ? 'site-nav-scrolled shadow-[0_12px_40px_rgba(0,0,0,0.45)] py-1'
+            : 'py-2'
         }`}
+        style={{
+          backdropFilter: scrolled ? 'blur(24px)' : 'blur(14px)',
+          backgroundColor: scrolled ? 'rgba(12, 10, 16, 0.96)' : 'transparent',
+        }}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="group flex min-w-0 items-center gap-3" onClick={() => setMobileOpen(false)}>
