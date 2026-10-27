@@ -1,6 +1,6 @@
-import HeroScrollIndicator from '@/components/HeroScrollIndicator';
 import HomeFeed from '@/components/site/HomeFeed';
 import HomeHeroVideoDynamic from '@/components/site/HomeHeroVideoDynamic';
+import InteractiveHeroHUD from '@/components/site/InteractiveHeroHUD';
 import { NewsletterSubscribeForm } from '@/components/site/NewsletterSubscribeForm';
 import type { FeedItem } from '@/lib/homeFeed';
 import { LODGE_ADDRESS, googleMapsLodgeUrl, googleStreetViewOpenUrl } from '@/lib/lodgeLocation';
@@ -54,9 +54,7 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
       </div>
 
       <section id="home" className="relative z-10 min-h-[100dvh] w-full">
-        <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 pb-24 pt-20 md:px-10 md:pb-28 md:pt-28">
-          <HeroScrollIndicator targetId="feed" />
-        </div>
+        <InteractiveHeroHUD />
       </section>
 
       <div className="relative z-10 w-full">
