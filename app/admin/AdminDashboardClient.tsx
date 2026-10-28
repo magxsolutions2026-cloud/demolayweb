@@ -859,7 +859,7 @@ function DashboardInner({
   }
 
   return (
-    <div className="admin-dashboard-bg flex h-[100dvh] overflow-hidden text-foreground">
+    <div className="admin-dashboard-bg flex h-[100dvh] overflow-hidden text-foreground font-sans">
       <AdminSidebar
         sections={sections}
         active={active}
@@ -871,6 +871,7 @@ function DashboardInner({
         chapterName={landing.hero?.title || null}
         logoUrl={landing.hero?.logo_url || null}
       />
+
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:pl-0">
         <AdminHeader
@@ -923,12 +924,13 @@ function DashboardInner({
             ) : (
               <>
                 <div className="space-y-2">
-                  <div>
-                    <h2 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">Overview</h2>
-                    <p className="text-foreground/55 text-sm">Key metrics across your chapter at a glance</p>
+                  <div className="mb-4">
+                    <h2 className="text-foreground text-lg font-bold tracking-tight md:text-xl font-mono">Overview</h2>
+                    <p className="text-foreground/50 text-sm">Key metrics across your chapter at a glance</p>
                   </div>
                   <AdminStatsCards items={statCards} />
                 </div>
+
 
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <AdminActionBar
@@ -952,11 +954,11 @@ function DashboardInner({
                 {listLoading ? <TableRowSkeleton rows={5} /> : null}
 
             {!listLoading && active === 'events' && (
-              <section className="admin-data-shell rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+              <section className="admin-glass-card rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-6 md:py-4 bg-white/[0.03]">
                   <div>
-                    <h3 className="text-foreground font-semibold tracking-tight">Events</h3>
-                    <p className="text-foreground/55 text-sm">Manage upcoming chapter events</p>
+                    <h3 className="text-foreground font-bold tracking-tight font-mono">Events</h3>
+                    <p className="text-foreground/50 text-sm">Manage upcoming chapter events</p>
                   </div>
                 </div>
                 <div className="p-3 md:p-4">
@@ -971,17 +973,17 @@ function DashboardInner({
                       <motion.li
                         layout
                         key={event.id}
-                        className="group border-gold/12 hover:border-gold/25 flex flex-col gap-3 rounded-xl border border-transparent bg-black/20 px-4 py-3 transition duration-200 hover:bg-white/[0.05] sm:flex-row sm:items-center sm:justify-between"
+                        className="group border-white/10 hover:border-white/20 flex flex-col gap-3 rounded-xl border border-transparent bg-white/[0.03] px-4 py-3 transition duration-200 hover:bg-white/[0.07] sm:flex-row sm:items-center sm:justify-between cursor-pointer"
                       >
                         <div className="min-w-0 flex-1">
                           <p className="text-foreground font-semibold tracking-tight">{event.title}</p>
                           <p className="text-foreground/60 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
                             <span className="inline-flex items-center gap-1">
-                              <Calendar className="text-gold/60 h-3.5 w-3.5" aria-hidden />
+                              <Calendar className="text-emerald-400 h-3.5 w-3.5" aria-hidden />
                               {formatSqlDate(event.event_date)}
                             </span>
                             <span aria-hidden>·</span>
-                            <span>{event.event_time}</span>
+                            <span className="text-foreground/80">{event.event_time}</span>
                             <span aria-hidden>·</span>
                             <span className="truncate">{event.location}</span>
                           </p>
@@ -1014,12 +1016,13 @@ function DashboardInner({
               </section>
             )}
 
+
             {!listLoading && active === 'officers' && (
-              <section className="admin-data-shell rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+              <section className="admin-glass-card rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-6 md:py-4 bg-white/[0.03]">
                   <div>
-                    <h3 className="text-foreground font-semibold tracking-tight">Officers</h3>
-                    <p className="text-foreground/55 text-sm">Chapter leadership roster</p>
+                    <h3 className="text-foreground font-bold tracking-tight font-mono">Officers</h3>
+                    <p className="text-foreground/50 text-sm">Chapter leadership roster</p>
                   </div>
                 </div>
                 <div className="p-3 md:p-4">
@@ -1031,11 +1034,11 @@ function DashboardInner({
                       <motion.li
                         layout
                         key={officer.id}
-                        className="group border-gold/12 hover:border-gold/25 flex flex-col gap-3 rounded-xl border border-transparent bg-black/20 px-4 py-3 transition duration-200 hover:bg-white/[0.05] sm:flex-row sm:items-center sm:justify-between"
+                        className="group border-white/10 hover:border-white/20 flex flex-col gap-3 rounded-xl border border-transparent bg-white/[0.03] px-4 py-3 transition duration-200 hover:bg-white/[0.07] sm:flex-row sm:items-center sm:justify-between cursor-pointer"
                       >
                         <div className="flex min-w-0 flex-1 items-start gap-3">
                           <div
-                            className="border-gold/25 h-14 w-14 shrink-0 overflow-hidden rounded-xl border bg-slate-800"
+                            className="border-white/20 h-14 w-14 shrink-0 overflow-hidden rounded-xl border bg-slate-800"
                             style={
                               officer.photo_url ? officerPhotoBackgroundStyle(officer) : undefined
                             }
@@ -1043,7 +1046,7 @@ function DashboardInner({
                           />
                           <div className="min-w-0">
                             <p className="text-foreground font-semibold">{officer.name}</p>
-                            <p className="text-foreground/65 text-sm">{officer.position}</p>
+                            <p className="text-foreground/60 text-sm">{officer.position}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -1068,12 +1071,13 @@ function DashboardInner({
               </section>
             )}
 
+
             {!listLoading && active === 'news' && (
-              <section className="admin-data-shell rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+              <section className="admin-glass-card rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-6 md:py-4 bg-white/[0.03]">
                   <div>
-                    <h3 className="text-foreground font-semibold tracking-tight">News</h3>
-                    <p className="text-foreground/55 text-sm">Published updates and announcements</p>
+                    <h3 className="text-foreground font-bold tracking-tight font-mono">News</h3>
+                    <p className="text-foreground/50 text-sm">Published updates and announcements</p>
                   </div>
                 </div>
                 <div className="p-3 md:p-4">
@@ -1085,13 +1089,13 @@ function DashboardInner({
                       <motion.li
                         layout
                         key={item.id}
-                        className="group border-gold/12 hover:border-gold/25 flex flex-col gap-3 rounded-xl border border-transparent bg-black/20 px-4 py-3 transition duration-200 hover:bg-white/[0.05] sm:flex-row sm:items-center sm:justify-between"
+                        className="group border-white/10 hover:border-white/20 flex flex-col gap-3 rounded-xl border border-transparent bg-white/[0.03] px-4 py-3 transition duration-200 hover:bg-white/[0.07] sm:flex-row sm:items-center sm:justify-between cursor-pointer"
                       >
                         <div className="min-w-0 flex-1">
                           <p className="text-foreground font-semibold">{item.title}</p>
-                          <p className="text-foreground/55 mt-1 line-clamp-2 text-sm">{item.summary}</p>
-                          <p className="text-foreground/45 mt-2 text-xs">/{item.slug}</p>
-                          <p className="text-gold/70 mt-2 text-xs">
+                          <p className="text-foreground/60 mt-1 line-clamp-2 text-sm">{item.summary}</p>
+                          <p className="text-foreground/40 mt-2 text-xs font-mono">/{item.slug}</p>
+                          <p className="text-emerald-400 mt-2 text-xs font-medium">
                             {item.image_urls?.length ? `${item.image_urls.length} photo${item.image_urls.length === 1 ? '' : 's'}` : 'No photos'}
                           </p>
                         </div>
@@ -1120,12 +1124,13 @@ function DashboardInner({
               </section>
             )}
 
+
             {!listLoading && active === 'sirKnights' && (
-              <section className="admin-data-shell rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+              <section className="admin-glass-card rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-6 md:py-4 bg-white/[0.03]">
                   <div>
-                    <h3 className="text-foreground font-semibold tracking-tight">Sir Knights</h3>
-                    <p className="text-foreground/55 text-sm">Approved chapter members</p>
+                    <h3 className="text-foreground font-bold tracking-tight font-mono">Sir Knights</h3>
+                    <p className="text-foreground/50 text-sm">Approved chapter members</p>
                   </div>
                 </div>
                 <div className="p-3 md:p-4">
@@ -1137,20 +1142,20 @@ function DashboardInner({
                       <motion.li
                         layout
                         key={member.id}
-                        className="border-gold/12 flex flex-col gap-3 rounded-xl border bg-black/20 px-4 py-3 transition duration-200 hover:border-gold/25 hover:bg-white/[0.04] md:flex-row md:items-start md:justify-between"
+                        className="border-white/10 flex flex-col gap-3 rounded-xl border bg-white/[0.03] px-4 py-3 transition duration-200 hover:border-white/20 hover:bg-white/[0.07] cursor-pointer md:flex-row md:items-start md:justify-between"
                       >
                         <div className="min-w-0">
                           <p className="text-foreground font-semibold">
                             {member.name}{' '}
                             <span className="text-foreground/50 font-normal">({member.age})</span>
                           </p>
-                          <p className="text-foreground/65 text-sm">
+                          <p className="text-foreground/60 text-sm">
                             {member.email} · {member.phone}
                           </p>
-                          <p className="text-foreground/55 text-sm">
+                          <p className="text-foreground/50 text-sm">
                             {member.school} · {member.address}
                           </p>
-                          <p className="text-foreground/50 mt-1 text-sm">Reason: {member.reason}</p>
+                          <p className="text-foreground/40 mt-1 text-sm italic">Reason: {member.reason}</p>
                         </div>
                         <div className="shrink-0">
                           <AdminBadge variant="approved">{member.status}</AdminBadge>
@@ -1162,6 +1167,7 @@ function DashboardInner({
                 </div>
               </section>
             )}
+
 
             {!listLoading && active === 'petitioners' && (
               <section className="admin-data-shell rounded-2xl overflow-hidden">
@@ -1284,11 +1290,11 @@ function DashboardInner({
             )}
 
             {!listLoading && active === 'subscribers' && (
-              <section className="admin-data-shell rounded-2xl overflow-hidden">
-                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+              <section className="admin-glass-card rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-6 md:py-4 bg-white/[0.03]">
                   <div>
-                    <h3 className="text-foreground font-semibold tracking-tight">Subscribers</h3>
-                    <p className="text-foreground/55 text-sm">Newsletter audience</p>
+                    <h3 className="text-foreground font-bold tracking-tight font-mono">Subscribers</h3>
+                    <p className="text-foreground/50 text-sm">Newsletter audience</p>
                   </div>
                 </div>
                 <div className="p-3 md:p-4">
@@ -1300,7 +1306,7 @@ function DashboardInner({
                       <motion.li
                         layout
                         key={sub.id}
-                        className="border-gold/12 hover:border-gold/20 flex items-center justify-between rounded-xl border bg-black/20 px-4 py-3 transition duration-200 hover:bg-white/[0.05]"
+                        className="border-white/10 hover:border-white/20 flex items-center justify-between rounded-xl border bg-white/[0.03] px-4 py-3 transition duration-200 hover:bg-white/[0.07] cursor-pointer"
                       >
                         <span className="text-foreground/90 font-medium">{sub.email}</span>
                         <span className="text-foreground/50 text-xs tabular-nums">
@@ -1313,6 +1319,7 @@ function DashboardInner({
                 </div>
               </section>
             )}
+
 
             {showPagination ? (
               <AdminPagination
