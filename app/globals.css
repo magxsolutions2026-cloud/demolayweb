@@ -36,13 +36,11 @@
   width: 280px;
   position: relative;
   transition: left 0.3s linear;
-  background: radial-gradient(circle at 30% 30%, rgba(195, 244, 255, 0.25), transparent 60%),
-    url("/images/demolay-world-map.svg");
-  background-size: cover, cover;
-  background-position: center, center;
-  background-blend-mode: screen, normal;
+  background: url("/images/demolay-world-map.svg");
+  background-size: cover;
+  background-position: left;
   border-radius: 50%;
-  animation: earthRotate 60s linear infinite;
+  animation: earthRotate 30s linear 0s infinite;
   box-shadow: 0px 0 40px RGBA(212, 175, 55, 0.25), -6px 0px 14px rgba(195, 244, 255, 0.25) inset,
     24px 6px 48px #000 inset, -34px -6px 56px rgba(195, 244, 255, 0.18) inset,
     340px 0px 70px #00000066 inset, 220px 0px 60px #000000aa inset;
@@ -57,6 +55,7 @@
   background: radial-gradient(circle, #d4af37 0%, #b8860b 100%);
   box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.18), 0 0 12px rgba(212, 175, 55, 0.6);
   animation: mapPinPulse 2.6s ease-in-out infinite;
+  z-index: 2;
 }
 
 .demolay-map-pin::after {
@@ -69,6 +68,109 @@
   border-radius: 50%;
   background: #f5f5f5;
   transform: translate(-50%, -50%);
+}
+
+.curved-corner-star {
+  display: flex;
+  position: relative;
+}
+
+#curved-corner-bottomleft,
+#curved-corner-bottomright,
+#curved-corner-topleft,
+#curved-corner-topright {
+  width: 4px;
+  height: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+#curved-corner-bottomleft:before,
+#curved-corner-bottomright:before,
+#curved-corner-topleft:before,
+#curved-corner-topright:before {
+  content: "";
+  display: block;
+  width: 200%;
+  height: 200%;
+  position: absolute;
+  border-radius: 50%;
+}
+
+#curved-corner-bottomleft:before {
+  bottom: 0;
+  left: 0;
+  box-shadow: -5px 5px 0 0 white;
+}
+
+#curved-corner-bottomright:before {
+  bottom: 0;
+  right: 0;
+  box-shadow: 5px 5px 0 0 white;
+}
+
+#curved-corner-topleft:before {
+  top: 0;
+  left: 0;
+  box-shadow: -5px -5px 0 0 white;
+}
+
+#curved-corner-topright:before {
+  top: 0;
+  right: 0;
+  box-shadow: 5px -5px 0 0 white;
+}
+
+#star-1 {
+  position: absolute;
+  left: -20px;
+  top: 10px;
+  animation: twinkling 3s infinite;
+  z-index: 1;
+}
+
+#star-2 {
+  position: absolute;
+  left: -40px;
+  top: 50px;
+  animation: twinkling 2s infinite;
+  z-index: 1;
+}
+#star-3 {
+  position: absolute;
+  left: 290px;
+  top: 40px;
+  animation: twinkling 4s infinite;
+  z-index: 1;
+}
+#star-4 {
+  position: absolute;
+  left: 260px;
+  top: 110px;
+  animation: twinkling 3s infinite;
+  z-index: 1;
+}
+#star-5 {
+  position: absolute;
+  left: 40px;
+  top: 250px;
+  animation: twinkling 1.5s infinite;
+  z-index: 1;
+}
+
+#star-6 {
+  position: absolute;
+  left: 200px;
+  top: -30px;
+  animation: twinkling 4s infinite;
+  z-index: 1;
+}
+#star-7 {
+  position: absolute;
+  left: 120px;
+  top: -40px;
+  animation: twinkling 2s infinite;
+  z-index: 1;
 }
 
 :root {

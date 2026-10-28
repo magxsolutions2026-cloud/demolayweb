@@ -115,6 +115,76 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
               <div className="grid items-center gap-8 lg:grid-cols-[280px_1fr]">
                 <div className="relative mx-auto flex h-[280px] w-[280px] items-center justify-center">
                   <div className="section-banner">
+                    <div id="star-1">
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-bottomright"></div>
+                        <div id="curved-corner-bottomleft"></div>
+                      </div>
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-topright"></div>
+                        <div id="curved-corner-topleft"></div>
+                      </div>
+                    </div>
+                    <div id="star-2">
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-bottomright"></div>
+                        <div id="curved-corner-bottomleft"></div>
+                      </div>
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-topright"></div>
+                        <div id="curved-corner-topleft"></div>
+                      </div>
+                    </div>
+                    <div id="star-3">
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-bottomright"></div>
+                        <div id="curved-corner-bottomleft"></div>
+                      </div>
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-topright"></div>
+                        <div id="curved-corner-topleft"></div>
+                      </div>
+                    </div>
+                    <div id="star-4">
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-bottomright"></div>
+                        <div id="curved-corner-bottomleft"></div>
+                      </div>
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-topright"></div>
+                        <div id="curved-corner-topleft"></div>
+                      </div>
+                    </div>
+                    <div id="star-5">
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-bottomright"></div>
+                        <div id="curved-corner-bottomleft"></div>
+                      </div>
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-topright"></div>
+                        <div id="curved-corner-topleft"></div>
+                      </div>
+                    </div>
+                    <div id="star-6">
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-bottomright"></div>
+                        <div id="curved-corner-bottomleft"></div>
+                      </div>
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-topright"></div>
+                        <div id="curved-corner-topleft"></div>
+                      </div>
+                    </div>
+                    <div id="star-7">
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-bottomright"></div>
+                        <div id="curved-corner-bottomleft"></div>
+                      </div>
+                      <div className="curved-corner-star">
+                        <div id="curved-corner-topright"></div>
+                        <div id="curved-corner-topleft"></div>
+                      </div>
+                    </div>
                     <div className="demolay-map-pin" style={{ left: '58%', top: '38%' }} />
                     <div className="demolay-map-pin" style={{ left: '52%', top: '44%', animationDelay: '0.4s' }} />
                     <div className="demolay-map-pin" style={{ left: '62%', top: '48%', animationDelay: '0.8s' }} />
