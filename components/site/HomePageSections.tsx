@@ -114,84 +114,24 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
               </div>
               <div className="grid items-center gap-8 lg:grid-cols-[280px_1fr]">
                 <div className="relative mx-auto flex h-[250px] w-[250px] items-center justify-center">
-                  <div className="section-banner">
-                    <div id="star-1">
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-bottomright"></div>
-                        <div id="curved-corner-bottomleft"></div>
+                  <div
+                    className="section-banner"
+                    role="img"
+                    aria-label="Rotating Earth with DeMolay pins in Canada, the United States, Brazil, Europe, Japan, the Philippines, and Australia."
+                  />
+                  <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
+                    {Array.from({ length: 7 }, (_, index) => (
+                      <div key={index} id={`star-${index + 1}`}>
+                        <div className="curved-corner-star">
+                          <div className="curved-corner-bottomright" />
+                          <div className="curved-corner-bottomleft" />
+                        </div>
+                        <div className="curved-corner-star">
+                          <div className="curved-corner-topright" />
+                          <div className="curved-corner-topleft" />
+                        </div>
                       </div>
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-topright"></div>
-                        <div id="curved-corner-topleft"></div>
-                      </div>
-                    </div>
-                    <div id="star-2">
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-bottomright"></div>
-                        <div id="curved-corner-bottomleft"></div>
-                      </div>
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-topright"></div>
-                        <div id="curved-corner-topleft"></div>
-                      </div>
-                    </div>
-                    <div id="star-3">
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-bottomright"></div>
-                        <div id="curved-corner-bottomleft"></div>
-                      </div>
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-topright"></div>
-                        <div id="curved-corner-topleft"></div>
-                      </div>
-                    </div>
-                    <div id="star-4">
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-bottomright"></div>
-                        <div id="curved-corner-bottomleft"></div>
-                      </div>
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-topright"></div>
-                        <div id="curved-corner-topleft"></div>
-                      </div>
-                    </div>
-                    <div id="star-5">
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-bottomright"></div>
-                        <div id="curved-corner-bottomleft"></div>
-                      </div>
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-topright"></div>
-                        <div id="curved-corner-topleft"></div>
-                      </div>
-                    </div>
-                    <div id="star-6">
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-bottomright"></div>
-                        <div id="curved-corner-bottomleft"></div>
-                      </div>
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-topright"></div>
-                        <div id="curved-corner-topleft"></div>
-                      </div>
-                    </div>
-                    <div id="star-7">
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-bottomright"></div>
-                        <div id="curved-corner-bottomleft"></div>
-                      </div>
-                      <div className="curved-corner-star">
-                        <div id="curved-corner-topright"></div>
-                        <div id="curved-corner-topleft"></div>
-                      </div>
-                    </div>
-                    <div className="demolay-map-pin" style={{ left: '58%', top: '38%' }} />
-                    <div className="demolay-map-pin" style={{ left: '52%', top: '44%', animationDelay: '0.4s' }} />
-                    <div className="demolay-map-pin" style={{ left: '62%', top: '48%', animationDelay: '0.8s' }} />
-                    <div className="demolay-map-pin" style={{ left: '46%', top: '36%', animationDelay: '1.2s' }} />
-                    <div className="demolay-map-pin" style={{ left: '28%', top: '52%', animationDelay: '1.6s' }} />
-                    <div className="demolay-map-pin" style={{ left: '72%', top: '46%', animationDelay: '2s' }} />
-                    <div className="demolay-map-pin" style={{ left: '36%', top: '32%', animationDelay: '2.4s' }} />
+                    ))}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
