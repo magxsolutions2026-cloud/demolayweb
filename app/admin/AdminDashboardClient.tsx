@@ -902,7 +902,7 @@ function DashboardInner({
 
         <div className="flex-1 overflow-y-auto">
           <div
-            className={`mx-auto space-y-6 px-4 py-5 md:space-y-8 md:px-6 md:py-6 ${active === 'funds' ? 'max-w-7xl' : 'max-w-6xl'}`}
+            className={`mx-auto space-y-6 px-4 py-6 md:space-y-8 md:px-8 md:py-8 lg:px-10 ${active === 'funds' ? 'max-w-[1600px]' : 'max-w-[1400px]'}`}
           >
             {active === 'funds' ? (
               <FundsWorkspace
@@ -922,9 +922,15 @@ function DashboardInner({
               />
             ) : (
               <>
-                <AdminStatsCards items={statCards} />
+                <div className="space-y-2">
+                  <div>
+                    <h2 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">Overview</h2>
+                    <p className="text-foreground/55 text-sm">Key metrics across your chapter at a glance</p>
+                  </div>
+                  <AdminStatsCards items={statCards} />
+                </div>
 
-                <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <AdminActionBar
                     searchValue={search}
                     onSearchChange={setSearch}
@@ -934,9 +940,9 @@ function DashboardInner({
                     onAction={'onAction' in ac ? ac.onAction : undefined}
                     showAction={'showAction' in ac ? ac.showAction !== false : false}
                   />
-                  <p className="text-foreground/55 text-xs tabular-nums md:text-sm">
+                  <p className="text-foreground/50 text-xs tabular-nums md:text-sm">
                     Showing{' '}
-                    <span className="text-foreground/85 font-medium">
+                    <span className="text-foreground/80 font-medium">
                       {rangeStart}–{rangeEnd}
                     </span>{' '}
                     of {activeRows.length}
@@ -946,7 +952,14 @@ function DashboardInner({
                 {listLoading ? <TableRowSkeleton rows={5} /> : null}
 
             {!listLoading && active === 'events' && (
-              <section className="admin-data-shell rounded-2xl p-3 md:p-4">
+              <section className="admin-data-shell rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+                  <div>
+                    <h3 className="text-foreground font-semibold tracking-tight">Events</h3>
+                    <p className="text-foreground/55 text-sm">Manage upcoming chapter events</p>
+                  </div>
+                </div>
+                <div className="p-3 md:p-4">
                 {pagedRows.length === 0 ? (
                   <AdminEmptyState
                     title="No events yet"
@@ -997,11 +1010,19 @@ function DashboardInner({
                     ))}
                   </ul>
                 )}
+                </div>
               </section>
             )}
 
             {!listLoading && active === 'officers' && (
-              <section className="admin-data-shell rounded-2xl p-3 md:p-4">
+              <section className="admin-data-shell rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+                  <div>
+                    <h3 className="text-foreground font-semibold tracking-tight">Officers</h3>
+                    <p className="text-foreground/55 text-sm">Chapter leadership roster</p>
+                  </div>
+                </div>
+                <div className="p-3 md:p-4">
                 {pagedRows.length === 0 ? (
                   <AdminEmptyState title="No officers" description="Add chapter officers for the public roster." />
                 ) : (
@@ -1043,11 +1064,19 @@ function DashboardInner({
                     ))}
                   </ul>
                 )}
+                </div>
               </section>
             )}
 
             {!listLoading && active === 'news' && (
-              <section className="admin-data-shell rounded-2xl p-3 md:p-4">
+              <section className="admin-data-shell rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+                  <div>
+                    <h3 className="text-foreground font-semibold tracking-tight">News</h3>
+                    <p className="text-foreground/55 text-sm">Published updates and announcements</p>
+                  </div>
+                </div>
+                <div className="p-3 md:p-4">
                 {pagedRows.length === 0 ? (
                   <AdminEmptyState title="No news posts" description="Publish updates for your chapter." />
                 ) : (
@@ -1087,11 +1116,19 @@ function DashboardInner({
                     ))}
                   </ul>
                 )}
+                </div>
               </section>
             )}
 
             {!listLoading && active === 'sirKnights' && (
-              <section className="admin-data-shell rounded-2xl p-3 md:p-4">
+              <section className="admin-data-shell rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+                  <div>
+                    <h3 className="text-foreground font-semibold tracking-tight">Sir Knights</h3>
+                    <p className="text-foreground/55 text-sm">Approved chapter members</p>
+                  </div>
+                </div>
+                <div className="p-3 md:p-4">
                 {pagedRows.length === 0 ? (
                   <AdminEmptyState title="No Sir Knights" description="Approved petitioners will appear here." />
                 ) : (
@@ -1122,11 +1159,19 @@ function DashboardInner({
                     ))}
                   </ul>
                 )}
+                </div>
               </section>
             )}
 
             {!listLoading && active === 'petitioners' && (
-              <section className="admin-data-shell rounded-2xl p-3 md:p-4">
+              <section className="admin-data-shell rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+                  <div>
+                    <h3 className="text-foreground font-semibold tracking-tight">Petitioners</h3>
+                    <p className="text-foreground/55 text-sm">Applications awaiting review</p>
+                  </div>
+                </div>
+                <div className="p-3 md:p-4">
                 {pagedRows.length === 0 ? (
                   <AdminEmptyState
                     title="No petitioners"
@@ -1234,11 +1279,19 @@ function DashboardInner({
                     })}
                   </ul>
                 )}
+                </div>
               </section>
             )}
 
             {!listLoading && active === 'subscribers' && (
-              <section className="admin-data-shell rounded-2xl p-3 md:p-4">
+              <section className="admin-data-shell rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between border-b border-gold/15 px-4 py-3 md:px-6 md:py-4">
+                  <div>
+                    <h3 className="text-foreground font-semibold tracking-tight">Subscribers</h3>
+                    <p className="text-foreground/55 text-sm">Newsletter audience</p>
+                  </div>
+                </div>
+                <div className="p-3 md:p-4">
                 {pagedRows.length === 0 ? (
                   <AdminEmptyState title="No subscribers" description="Newsletter signups appear here." />
                 ) : (
@@ -1257,6 +1310,7 @@ function DashboardInner({
                     ))}
                   </ul>
                 )}
+                </div>
               </section>
             )}
 
