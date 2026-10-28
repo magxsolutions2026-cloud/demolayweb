@@ -120,7 +120,7 @@ export default function InteractiveHeroHUD() {
       {/* ======================================================== */}
       {/* 2. PERIMETER EDITORIAL TYPOGRAPHY & MAGNETIC CTA (BOTTOM-LEFT) */}
       {/* ======================================================== */}
-      <div className="relative z-20 flex flex-col items-start justify-end gap-8">
+      <div className="relative z-20 hidden flex-col items-start justify-end gap-8 md:flex">
         <motion.div
           animate={{
             x: mouseOffset.x * 10,
