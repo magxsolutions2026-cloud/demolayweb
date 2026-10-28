@@ -113,7 +113,7 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
                 <div className="text-foreground/60 text-xs uppercase tracking-[0.2em]">Active Jurisdictions</div>
               </div>
               <div className="grid items-center gap-8 lg:grid-cols-[280px_1fr]">
-                <div className="relative mx-auto flex h-[280px] w-[280px] items-center justify-center">
+                <div className="relative mx-auto flex h-[250px] w-[250px] items-center justify-center">
                   <div className="section-banner">
                     <div id="star-1">
                       <div className="curved-corner-star">
