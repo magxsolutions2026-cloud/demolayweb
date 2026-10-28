@@ -1,5 +1,76 @@
 @import "tailwindcss";
 
+@keyframes earthRotate {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+@keyframes twinkling {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes mapPinPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+.section-banner {
+  height: 280px;
+  width: 280px;
+  position: relative;
+  transition: left 0.3s linear;
+  background: radial-gradient(circle at 30% 30%, rgba(195, 244, 255, 0.25), transparent 60%),
+    url("/images/demolay-world-map.svg");
+  background-size: cover, cover;
+  background-position: center, center;
+  background-blend-mode: screen, normal;
+  border-radius: 50%;
+  animation: earthRotate 60s linear infinite;
+  box-shadow: 0px 0 40px RGBA(212, 175, 55, 0.25), -6px 0px 14px rgba(195, 244, 255, 0.25) inset,
+    24px 6px 48px #000 inset, -34px -6px 56px rgba(195, 244, 255, 0.18) inset,
+    340px 0px 70px #00000066 inset, 220px 0px 60px #000000aa inset;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+}
+
+.demolay-map-pin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #d4af37 0%, #b8860b 100%);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.18), 0 0 12px rgba(212, 175, 55, 0.6);
+  animation: mapPinPulse 2.6s ease-in-out infinite;
+}
+
+.demolay-map-pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  transform: translate(-50%, -50%);
+}
+
 :root {
   --background: #0a0a0a;
   --foreground: #f5f5f5;

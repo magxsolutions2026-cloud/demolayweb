@@ -94,6 +94,64 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
             </div>
           </div>
 
+          {/* DeMolay Worldwide Map */}
+          <div className="mx-auto mt-8 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] md:mt-12">
+            <div className="glass relative overflow-hidden rounded-3xl p-6 backdrop-blur-xl md:p-8">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
+              <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="font-semibold uppercase tracking-[0.22em] text-gold/95 text-[0.72rem] md:text-xs">
+                    Worldwide Brotherhood
+                  </p>
+                  <h2 className="font-serif mt-2 text-2xl font-bold leading-tight text-foreground md:text-3xl">
+                    DeMolay Around the World
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm text-foreground/75 md:text-base">
+                    Active chapters span across continents, united by the same values of leadership, service, and brotherhood.
+                  </p>
+                </div>
+                <div className="text-foreground/60 text-xs uppercase tracking-[0.2em]">Active Jurisdictions</div>
+              </div>
+              <div className="grid items-center gap-8 lg:grid-cols-[280px_1fr]">
+                <div className="relative mx-auto flex h-[280px] w-[280px] items-center justify-center">
+                  <div className="section-banner">
+                    <div className="demolay-map-pin" style={{ left: '58%', top: '38%' }} />
+                    <div className="demolay-map-pin" style={{ left: '52%', top: '44%', animationDelay: '0.4s' }} />
+                    <div className="demolay-map-pin" style={{ left: '62%', top: '48%', animationDelay: '0.8s' }} />
+                    <div className="demolay-map-pin" style={{ left: '46%', top: '36%', animationDelay: '1.2s' }} />
+                    <div className="demolay-map-pin" style={{ left: '28%', top: '52%', animationDelay: '1.6s' }} />
+                    <div className="demolay-map-pin" style={{ left: '72%', top: '46%', animationDelay: '2s' }} />
+                    <div className="demolay-map-pin" style={{ left: '36%', top: '32%', animationDelay: '2.4s' }} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {[
+                    'United States',
+                    'Canada',
+                    'Brazil',
+                    'Argentina',
+                    'Philippines',
+                    'Australia',
+                    'Germany',
+                    'France',
+                    'Italy',
+                    'Japan',
+                    'South Africa',
+                    'Mexico',
+                  ].map((country) => (
+                    <div
+                      key={country}
+                      className="flex items-center gap-2 rounded-xl border border-gold/15 bg-black/25 px-3 py-2 text-sm text-foreground/80"
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-gold/80 shadow-[0_0_8px_rgba(212,175,55,0.5)]" />
+                      {country}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Lodge CTA merged into the same "chapter feed" area */}
           <div className="mx-auto mt-8 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] md:mt-12">
             <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gold/25 bg-[rgba(12,10,16,0.38)] shadow-lg backdrop-blur-xl">
