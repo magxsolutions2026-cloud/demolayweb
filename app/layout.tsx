@@ -16,6 +16,17 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "T. De Leon Chapter No. 47 - Order of DeMolay",
   description: "Brotherhood. Leadership. Legacy. Join the T. De Leon Chapter No. 47 of the Order of DeMolay.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "192x192" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
