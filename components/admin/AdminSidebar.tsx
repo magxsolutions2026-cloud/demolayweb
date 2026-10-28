@@ -125,6 +125,11 @@ export function AdminSidebar({
         ) : null}
 
         <nav className={`flex-1 space-y-1 overflow-y-auto py-4 ${collapsed ? 'lg:px-2' : 'px-3'}`}>
+        {!collapsed ? (
+          <div className="mb-3 px-1">
+            <img src="/images/dashboard-mockup.png" alt="Dashboard preview" className="w-full rounded-xl border border-gold/15 shadow-[0_18px_40px_rgba(0,0,0,0.4)]" loading="lazy" />
+          </div>
+        ) : null}
           <p className={`text-foreground/45 mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] ${collapsed ? 'lg:hidden' : ''}`}>
             Modules
           </p>
