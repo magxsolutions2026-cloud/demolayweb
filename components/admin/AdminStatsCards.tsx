@@ -92,11 +92,11 @@ export function AdminStatsCards({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.22, delay: i * 0.035 }}
             whileHover={{ y: -4, transition: { duration: 0.18 } }}
-            className="admin-stat-card border-gold/18 group relative min-w-0 overflow-hidden rounded-[24px] border bg-[linear-gradient(145deg,rgba(255,255,255,0.075),rgba(255,255,255,0.02))] p-3.5 shadow-[0_14px_34px_rgba(0,0,0,0.2)] xl:p-3"
+            className="admin-stat-card border-gold/20 group relative min-w-0 overflow-hidden rounded-[24px] border bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.12),transparent_55%),linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.015))] p-3.5 shadow-[0_20px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(212,175,55,0.18),inset_0_1px_0_rgba(255,255,255,0.12)] xl:p-3"
           >
-            <div className={`pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-br ${preset.glowClass} opacity-85 blur-2xl transition duration-300 group-hover:opacity-100`} />
-            <div className="admin-stat-card-ring pointer-events-none absolute inset-0 rounded-[24px] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-br ${preset.glowClass} opacity-90 blur-3xl transition duration-500 group-hover:opacity-100`} />
+            <div className="admin-stat-card-ring pointer-events-none absolute inset-0 rounded-[24px] opacity-70 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
             <div className="relative flex h-full flex-col">
               <div className="flex items-start justify-between gap-2">
@@ -112,7 +112,7 @@ export function AdminStatsCards({
                   </p>
                 </div>
 
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[18px] border backdrop-blur-md transition duration-300 group-hover:scale-105 xl:h-9 xl:w-9 ${preset.iconShellClass}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[18px] border backdrop-blur-md transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_0_4px_rgba(212,175,55,0.08)] xl:h-9 xl:w-9 ${preset.iconShellClass}`}>
                   <Icon className="h-4.5 w-4.5" aria-hidden />
                 </div>
               </div>
@@ -132,10 +132,10 @@ export function AdminStatsCards({
                     </span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/8">
-                    <div
-                      className={`h-full rounded-full bg-gradient-to-r ${preset.progressClass} transition-[width] duration-500`}
-                      style={{ width: `${progressWidth}%` }}
-                    />
+                  <div
+                    className={`h-full rounded-full bg-gradient-to-r ${preset.progressClass} transition-[width] duration-700 ease-out`}
+                    style={{ width: `${progressWidth}%` }}
+                  />
                   </div>
                 </div>
               </div>

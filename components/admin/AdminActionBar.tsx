@@ -25,10 +25,10 @@ export function AdminActionBar({
   return (
     <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
       {showSearch ? (
-        <div className="relative w-full md:max-w-md md:min-w-0">
-          <Search className="text-foreground/40 pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2" aria-hidden />
+        <div className="group relative w-full md:max-w-md md:min-w-0">
+          <Search className="text-foreground/40 group-focus-within:text-gold/70 pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-200" aria-hidden />
           <input
-            className="input focus:border-gold/55 w-full rounded-xl border-white/12 bg-black/30 py-2.5 pl-12 pr-3 text-sm transition duration-200 placeholder:text-foreground/40"
+            className="input focus:border-gold/60 focus:shadow-[0_0_0_3px_rgba(212,175,55,0.08)] w-full rounded-xl border-white/12 bg-black/25 py-2.5 pl-12 pr-3 text-sm transition-all duration-200 placeholder:text-foreground/40"
             style={{ paddingLeft: '3.25rem' }}
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
