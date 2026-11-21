@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, Crosshair, Sparkles } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import HeroScrollIndicator from '@/components/HeroScrollIndicator';
 import { useJoinUsModal } from './JoinUsModalContext';
@@ -54,55 +54,6 @@ export default function InteractiveHeroHUD() {
       {/* ======================================================== */}
       {/* 1. ARCHITECTURAL HUD CORNER RETICLES & DATA READOUTS     */}
       {/* ======================================================== */}
-
-      {/* Top Left: Chapter Identity & Monospace Coordinates */}
-      <motion.div
-        animate={{
-          x: mouseOffset.x * 6,
-          y: mouseOffset.y * 6,
-        }}
-        transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-        className="pointer-events-none absolute left-4 top-20 z-20 flex flex-col gap-1 sm:left-8 sm:top-24 lg:left-12 lg:top-28 xl:left-16"
-      >
-        <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 items-center justify-center">
-            <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-gold/60" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold" />
-          </span>
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-gold/90 sm:text-xs">
-            ARCHIVE // SPECIMEN 01
-          </span>
-        </div>
-        <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/45 sm:text-[10px]">
-          <span>COORD: 14°42&apos;N 120°58&apos;E</span>
-          <span className="text-gold/40">/</span>
-          <span>VALENZUELA</span>
-        </div>
-        <div className="mt-1 flex items-center gap-1.5 text-gold/30">
-          <Crosshair className="h-3 w-3" />
-          <div className="h-[1px] w-12 bg-gold/25" />
-        </div>
-      </motion.div>
-
-      {/* Top Right: Status Badge & 3D Interactive Indicator */}
-      <motion.div
-        animate={{
-          x: -mouseOffset.x * 6,
-          y: mouseOffset.y * 6,
-        }}
-        transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-        className="pointer-events-none absolute right-4 top-20 z-20 hidden flex-col items-end gap-1 sm:flex sm:right-8 sm:top-24 lg:right-12 lg:top-28 xl:right-16"
-      >
-        <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-black/40 px-3 py-1 backdrop-blur-md">
-          <Sparkles className="h-3 w-3 text-gold" />
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-gold/90">
-            3D SPATIAL CANVAS
-          </span>
-        </div>
-        <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/40">
-          STABILITY 100% · SCROLL TO ORBIT
-        </p>
-      </motion.div>
 
       {/* Corner Brackets [ + ] Decorative Watermarks */}
       <div className="pointer-events-none absolute inset-x-4 top-16 z-10 flex justify-between text-gold/25 sm:inset-x-8 lg:inset-x-12 xl:inset-x-16" aria-hidden>
