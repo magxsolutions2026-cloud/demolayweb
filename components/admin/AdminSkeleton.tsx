@@ -2,18 +2,19 @@
 
 export function AdminSkeleton() {
   return (
-    <div className="animate-pulse space-y-6 p-4 md:p-6">
-      <div className="flex gap-4">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="bg-foreground/8 h-24 flex-1 rounded-2xl" />
-        ))}
-      </div>
-      <div className="flex gap-6">
-        <div className="bg-foreground/8 hidden h-[420px] w-64 rounded-2xl lg:block" />
-        <div className="flex-1 space-y-4">
-          <div className="bg-foreground/8 h-12 rounded-xl" />
-          <div className="bg-foreground/8 h-40 rounded-2xl" />
-          <div className="bg-foreground/8 h-40 rounded-2xl" />
+    <div className="animate-pulse flex min-h-0 flex-1">
+      <div className="bg-foreground/5 hidden w-[248px] shrink-0 border-r border-white/5 lg:block" />
+      <div className="min-w-0 flex-1 space-y-6 p-4 md:p-8">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-foreground/8 h-28 rounded-2xl" />
+          ))}
+        </div>
+        <div className="bg-foreground/8 h-12 rounded-xl" />
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="bg-foreground/8 h-20 rounded-2xl" />
+          ))}
         </div>
       </div>
     </div>

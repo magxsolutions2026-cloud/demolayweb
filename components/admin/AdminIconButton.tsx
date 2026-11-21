@@ -20,7 +20,7 @@ export function AdminIconButton({
       {...props}
     >
       {children}
-      <span className="pointer-events-none absolute -top-8 left-1/2 z-10 hidden -translate-x-1/2 rounded-md border border-white/10 bg-[#1a1624] px-2 py-1 text-[10px] font-medium text-foreground/90 shadow-md sm:group-hover:block">
+      <span className="pointer-events-none absolute -top-8 left-1/2 z-10 hidden -translate-x-1/2 rounded-md border border-white/10 bg-[#1a1624] px-2 py-1 text-[10px] font-medium text-foreground/90 shadow-md sm:group-focus-visible:block sm:group-hover:block">
         {label}
       </span>
     </button>

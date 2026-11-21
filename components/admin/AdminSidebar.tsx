@@ -11,6 +11,7 @@ import {
   PanelLeftClose,
   PanelLeft,
   ShieldUser,
+  UserCog,
   Users,
   Wallet,
 } from 'lucide-react';
@@ -27,7 +28,7 @@ const iconFor = (id: LandingSection) => {
     sirKnights: ShieldUser,
     petitioners: ClipboardList,
     subscribers: Mail,
-    accounts: ShieldUser,
+    accounts: UserCog,
   };
   return map[id];
 };
@@ -125,11 +126,6 @@ export function AdminSidebar({
         ) : null}
 
         <nav className={`flex-1 space-y-1 overflow-y-auto py-4 ${collapsed ? 'lg:px-2' : 'px-3'}`}>
-        {!collapsed ? (
-          <div className="mb-3 px-1">
-            <img src="/images/dashboard-mockup.png" alt="Dashboard preview" className="w-full rounded-xl border border-gold/15 shadow-[0_18px_40px_rgba(0,0,0,0.4)]" loading="lazy" />
-          </div>
-        ) : null}
           <p className={`text-foreground/45 mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] ${collapsed ? 'lg:hidden' : ''}`}>
             Modules
           </p>
@@ -148,7 +144,7 @@ export function AdminSidebar({
                         [section.id]: !groupOpen,
                       }))
                     }
-                    className={`relative flex w-full items-center gap-3 rounded-xl py-2.5 text-left text-sm font-medium transition duration-200 ease-out ${
+                    className={`relative flex w-full items-center gap-3 rounded-xl py-2.5 text-left text-sm font-medium transition duration-200 ease-out focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0c14] ${
                       collapsed ? 'lg:justify-center lg:px-0 lg:py-3' : 'px-3'
                     } ${
                       groupActive
@@ -194,7 +190,8 @@ export function AdminSidebar({
                                   onSelect(child.id);
                                   onMobileOpenChange(false);
                                 }}
-                                className={`relative flex w-full items-center gap-3 rounded-xl py-2.5 text-left text-sm font-medium transition duration-200 ease-out ${
+                                aria-current={isChildActive ? 'page' : undefined}
+                                className={`relative flex w-full items-center gap-3 rounded-xl py-2.5 text-left text-sm font-medium transition duration-200 ease-out focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0c14] ${
                                   collapsed ? 'lg:justify-center lg:px-0 lg:py-3' : 'px-3'
                                 } ${
                                   isChildActive
@@ -231,7 +228,8 @@ export function AdminSidebar({
                   onSelect(section.id);
                   onMobileOpenChange(false);
                 }}
-                className={`relative flex w-full items-center gap-3 rounded-xl py-2.5 text-left text-sm font-medium transition duration-200 ease-out ${
+                aria-current={isActive ? 'page' : undefined}
+                className={`relative flex w-full items-center gap-3 rounded-xl py-2.5 text-left text-sm font-medium transition duration-200 ease-out focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e0c14] ${
                   collapsed ? 'lg:justify-center lg:px-0 lg:py-3' : 'px-3'
                 } ${
                   isActive

@@ -155,9 +155,9 @@ function DashboardInner({
   const realtimeFetchQueuedRef = useRef(false);
 
   const fetchAll = useCallback(
-    async (opts?: { boot?: boolean }) => {
+    async (opts?: { boot?: boolean; silent?: boolean }) => {
       const isBoot = opts?.boot === true;
-      setListLoading(true);
+      setListLoading(!opts?.silent);
       try {
         const [l, e, o, n, p, s, a, ord] = await Promise.all([
           fetch('/api/admin/landing', { credentials: 'include' }),
@@ -234,7 +234,7 @@ function DashboardInner({
 
       realtimeFetchInFlightRef.current = true;
       try {
-        await fetchAll();
+        await fetchAll({ silent: true });
       } finally {
         realtimeFetchInFlightRef.current = false;
         if (realtimeFetchQueuedRef.current && !disposed) {
@@ -872,13 +872,10 @@ function DashboardInner({
         logoUrl={landing.hero?.logo_url || null}
       />
 
-
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:pl-0">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <AdminHeader
           title={moduleTitle[active]}
           username={username}
-          chapterName={landing.hero?.title || null}
-          logoUrl={landing.hero?.logo_url || null}
           onMenuClick={() => setMobileSidebar(true)}
           notificationBadgeTotal={notifUnreadPetitionersCount + notifUnreadSubscribersCount + notifUnreadOrdersCount}
           petitionerPreviews={petitionerPreviews}
@@ -902,9 +899,7 @@ function DashboardInner({
         />
 
         <div className="flex-1 overflow-y-auto">
-          <div
-            className={`mx-auto space-y-6 px-4 py-6 md:space-y-8 md:px-8 md:py-8 lg:px-10 ${active === 'funds' ? 'max-w-[1600px]' : 'max-w-[1400px]'}`}
-          >
+          <div className="mx-auto max-w-[1600px] space-y-6 px-4 py-6 md:space-y-8 md:px-8 md:py-8 lg:px-10">
             {active === 'funds' ? (
               <FundsWorkspace
                 toast={toast}
@@ -923,14 +918,15 @@ function DashboardInner({
               />
             ) : (
               <>
-                <div className="space-y-2">
-                  <div className="mb-4">
-                    <h2 className="text-foreground text-lg font-bold tracking-tight md:text-xl font-mono">Overview</h2>
-                    <p className="text-foreground/50 text-sm">Key metrics across your chapter at a glance</p>
+                <div className="space-y-3">
+                  <div>
+                    <h2 className="text-foreground font-mono text-base font-semibold tracking-tight md:text-lg">
+                      Chapter snapshot
+                    </h2>
+                    <p className="text-foreground/50 text-xs">Across all modules · updates automatically</p>
                   </div>
                   <AdminStatsCards items={statCards} />
                 </div>
-
 
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <AdminActionBar

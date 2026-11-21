@@ -11,9 +11,9 @@ export default function AdminLogin() {
         <div className="bg-slate-900/70 p-4 rounded-xl border border-gold/20">
           <h2 className="text-2xl font-semibold text-white mb-3">What to do</h2>
           <ul className="list-disc list-inside text-foreground/80 space-y-2">
-            <li>Click Admin (button in navbar)</li>
-            <li>Type credentials (admin + AdminPassword1!)</li>
-            <li>Submit and land at <code>/admin/dashboard</code></li>
+            <li>Open the public site and click Admin in the navbar</li>
+            <li>Sign in with your chapter administrator account</li>
+            <li>You will land at <code>/admin/dashboard</code></li>
           </ul>
         </div>
 

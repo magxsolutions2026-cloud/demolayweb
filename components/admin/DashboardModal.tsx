@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { X } from 'lucide-react';
 
 type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -30,6 +30,13 @@ export function DashboardModal({
   footer?: React.ReactNode;
   size?: ModalSize;
 }) {
+  const titleId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (open) closeRef.current?.focus();
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -61,7 +68,7 @@ export function DashboardModal({
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-labelledby="admin-modal-title"
+            aria-labelledby={titleId}
             initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
@@ -73,7 +80,7 @@ export function DashboardModal({
             <div className="relative flex max-h-[inherit] flex-col">
               <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/10 px-5 py-4 sm:px-6 sm:py-5">
                 <div className="min-w-0 space-y-1 pr-8">
-                  <h2 id="admin-modal-title" className="text-lg font-semibold tracking-tight text-gold sm:text-xl">
+                  <h2 id={titleId} className="text-lg font-semibold tracking-tight text-gold sm:text-xl">
                     {title}
                   </h2>
                   {description ? (
@@ -81,9 +88,10 @@ export function DashboardModal({
                   ) : null}
                 </div>
                 <button
+                  ref={closeRef}
                   type="button"
                   onClick={onClose}
-                  className="text-foreground/50 hover:text-gold absolute right-3 top-3 rounded-lg p-2 transition duration-200 hover:scale-105 hover:bg-white/10"
+                  className="text-foreground/50 hover:text-gold absolute right-3 top-3 rounded-lg p-2 transition duration-200 hover:scale-105 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-gold/50"
                   aria-label="Close dialog"
                 >
                   <X className="h-5 w-5" />

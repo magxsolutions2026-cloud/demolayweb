@@ -832,7 +832,7 @@ export function FundsWorkspace({
             <p className="text-foreground/75 text-sm font-medium">Transparency · fundraising · disbursements</p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-1.5 sm:justify-end">
+        <nav aria-label="Funds sections" className="flex flex-wrap gap-1.5 sm:justify-end">
           {TABS.map((t) => {
             const Icon = t.icon;
             const on = tab === t.id;
@@ -841,18 +841,19 @@ export function FundsWorkspace({
                 key={t.id}
                 type="button"
                 onClick={() => setTab(t.id)}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                aria-current={on ? 'page' : undefined}
+                className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0a10] ${
                   on
-                    ? 'bg-gold/20 text-gold border-gold/35 border shadow-[0_0_20px_rgba(212,175,55,0.12)]'
-                    : 'text-foreground/65 hover:bg-white/6 border border-transparent'
+                    ? 'border-gold/35 bg-gold/20 text-gold shadow-[0_0_20px_rgba(212,175,55,0.12)]'
+                    : 'border-transparent text-foreground/65 hover:bg-white/6'
                 }`}
               >
-                <Icon className="h-3.5 w-3.5 opacity-90" />
+                <Icon className="h-3.5 w-3.5 opacity-90" aria-hidden />
                 {t.label}
               </button>
             );
           })}
-        </div>
+        </nav>
       </motion.div>
 
       <AnimatePresence mode="wait">
@@ -1143,20 +1144,22 @@ export function FundsWorkspace({
                       </span>
                       <button
                         type="button"
-                        className="text-foreground/50 hover:text-gold rounded-lg p-2"
+                        aria-label={`Edit disbursement ${row.title}`}
+                        className="text-foreground/50 hover:text-gold rounded-lg p-2 focus-visible:ring-2 focus-visible:ring-gold/50"
                         onClick={() => {
                           setDisEdit(row);
                           setDisModal(true);
                         }}
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" aria-hidden />
                       </button>
                       <button
                         type="button"
-                        className="text-foreground/50 hover:text-rose-400 rounded-lg p-2"
+                        aria-label={`Delete disbursement ${row.title}`}
+                        className="text-foreground/50 hover:text-rose-400 rounded-lg p-2 focus-visible:ring-2 focus-visible:ring-rose-400/50"
                         onClick={() => setDeleteTarget({ kind: 'dis', id: row.id, title: row.title })}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" aria-hidden />
                       </button>
                     </div>
                   </li>
@@ -1419,8 +1422,8 @@ export function FundsWorkspace({
               </AdminPrimaryButton>
             </div>
 
-            <div className="border-gold/20 overflow-hidden rounded-2xl border">
-              <table className="w-full text-left text-sm">
+            <div className="border-gold/20 overflow-x-auto rounded-2xl border">
+              <table className="w-full min-w-[520px] text-left text-sm">
                 <thead className="bg-white/[0.04] text-foreground/60">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Month</th>

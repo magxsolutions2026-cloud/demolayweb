@@ -3,7 +3,6 @@
 import { Bell, ChevronDown, HandCoins, LogOut, Mail, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { formatRelativeTime } from '@/lib/formatRelativeTime';
-import { AdminBrandMark } from '@/components/admin/AdminBrandMark';
 import { AdminSidebarMobileTrigger } from './AdminSidebar';
 
 export type PetitionerNotifPreview = { id: number; name: string; submittedAt: string; read: boolean };
@@ -21,8 +20,6 @@ export type TShirtOrderNotifPreview = {
 export function AdminHeader({
   title,
   username,
-  logoUrl,
-  chapterName,
   onMenuClick,
   notificationBadgeTotal,
   petitionerPreviews,
@@ -35,9 +32,6 @@ export function AdminHeader({
 }: {
   title: string;
   username: string;
-  /** Used for logo `alt` text only */
-  chapterName?: string | null;
-  logoUrl?: string | null;
   onMenuClick: () => void;
   notificationBadgeTotal: number;
   petitionerPreviews: PetitionerNotifPreview[];
@@ -69,12 +63,9 @@ export function AdminHeader({
     <header className="admin-header sticky top-0 z-30 flex shrink-0 items-center justify-between gap-3 border-b border-gold/15 px-4 py-3 backdrop-blur-xl md:px-6 md:py-4">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <AdminSidebarMobileTrigger onClick={onMenuClick} />
-        <AdminBrandMark logoUrl={logoUrl} alt={chapterName || 'Chapter'} size="md" />
         <div className="min-w-0">
-          <p className="text-gold/90 text-[10px] font-semibold uppercase tracking-[0.2em] md:text-xs">
-            Welcome, Sir Knight
-          </p>
-          <h1 className="sr-only">{title}</h1>
+          <h1 className="text-foreground truncate text-base font-semibold tracking-tight md:text-lg">{title}</h1>
+          <p className="text-gold/90 text-[10px] font-semibold uppercase tracking-[0.2em]">Welcome, Sir Knight</p>
         </div>
       </div>
 
@@ -86,7 +77,7 @@ export function AdminHeader({
               setNotifOpen((n) => !n);
               setOpen(false);
             }}
-            className="border-gold/20 hover:border-gold/45 text-foreground/85 hover:text-gold relative rounded-xl border bg-black/20 p-2 transition duration-200 hover:bg-white/5"
+            className="border-gold/20 hover:border-gold/45 text-foreground/85 hover:text-gold relative rounded-xl border bg-black/20 p-2 transition duration-200 hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0a10]"
             aria-expanded={notifOpen}
             aria-haspopup="true"
             aria-label={`Notifications${notificationBadgeTotal ? `, ${notificationBadgeTotal} items` : ''}`}
@@ -285,7 +276,8 @@ export function AdminHeader({
               setOpen((o) => !o);
               setNotifOpen(false);
             }}
-            className="border-gold/20 hover:border-gold/40 flex items-center gap-2 rounded-xl border bg-black/20 py-1.5 pl-1.5 pr-2 transition duration-200 hover:bg-white/5"
+            className="border-gold/20 hover:border-gold/40 flex items-center gap-2 rounded-xl border bg-black/20 py-1.5 pl-1.5 pr-2 transition duration-200 hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0a10]"
+            aria-label={`Account menu for ${username}`}
             aria-expanded={open}
             aria-haspopup="true"
           >
