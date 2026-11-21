@@ -5,11 +5,13 @@ import {
   Calendar,
   ChevronDown,
   ClipboardList,
+  LayoutDashboard,
   Mail,
   Menu,
   Newspaper,
   PanelLeftClose,
   PanelLeft,
+  Settings2,
   ShieldUser,
   UserCog,
   Users,
@@ -21,6 +23,7 @@ import type { LandingSection, NavGroup, NavSection } from './types';
 
 const iconFor = (id: LandingSection) => {
   const map: Record<LandingSection, typeof Calendar> = {
+    overview: LayoutDashboard,
     funds: Wallet,
     events: Calendar,
     officers: Users,
@@ -29,6 +32,7 @@ const iconFor = (id: LandingSection) => {
     petitioners: ClipboardList,
     subscribers: Mail,
     accounts: UserCog,
+    settings: Settings2,
   };
   return map[id];
 };

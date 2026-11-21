@@ -1,6 +1,7 @@
 import type { AdminAccountStatus } from '@/lib/adminAccountConfig';
 
 export type LandingSection =
+  | 'overview'
   | 'funds'
   | 'events'
   | 'officers'
@@ -8,7 +9,8 @@ export type LandingSection =
   | 'sirKnights'
   | 'petitioners'
   | 'subscribers'
-  | 'accounts';
+  | 'accounts'
+  | 'settings';
 
 export type EventCategory = 'important' | 'formal' | 'activity';
 

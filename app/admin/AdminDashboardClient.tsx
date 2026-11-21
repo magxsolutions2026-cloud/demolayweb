@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Check, Pencil, Trash2, XCircle } from 'lucide-react';
+import { Activity, Calendar, Check, Pencil, Plus, Trash2, TrendingUp, XCircle } from 'lucide-react';
 import { notificationEventTimeOrMin, useAdminNotifLastRead } from '@/lib/adminNotifLastRead';
 import { formatSqlDate } from '@/lib/formatDb';
 import { cleanNewsImageUrls, MAX_NEWS_IMAGES } from '@/lib/newsImages';
@@ -15,14 +15,17 @@ import { DashboardModal } from '@/components/admin/DashboardModal';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
 import { AdminEmptyState } from '@/components/admin/AdminEmptyState';
 import { AdminField, adminInputClass } from '@/components/admin/AdminFormFields';
-import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminIconButton } from '@/components/admin/AdminIconButton';
 import { AdminPagination } from '@/components/admin/AdminPagination';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminSkeleton, TableRowSkeleton } from '@/components/admin/AdminSkeleton';
 import { FundsWorkspace, type FundsTabId } from '@/components/admin/funds/FundsWorkspace';
-import { AdminStatsCards } from '@/components/admin/AdminStatsCards';
 import { ToastProvider, useAdminToast } from '@/components/admin/ToastContext';
+import ThemeToggle from '@/components/ThemeToggle';
+import { DataTable, StatusPill, type DataTableStatus } from '@/components/admin/layout/DataTable';
+import { DashboardLayout } from '@/components/admin/layout/DashboardLayout';
+import { StatCard } from '@/components/admin/layout/StatCard';
+import { navIconFor, type AppNavItem } from '@/components/admin/layout/Sidebar';
+import type { TopbarProps } from '@/components/admin/layout/Topbar';
 import type {
   CampaignOrderItem,
   EventCategory,
@@ -30,31 +33,27 @@ import type {
   AdminUserItem,
   LandingData,
   LandingSection,
-  NavSection,
   NewsItem,
   OfficerItem,
   PetitionerItem,
   SubscriberItem,
 } from '@/components/admin/types';
 
-const sections: NavSection[] = [
-  { id: 'funds', label: 'Chapter Funds' },
-  { id: 'events', label: 'Events' },
-  { id: 'news', label: 'News' },
-  {
-    id: 'chapterMembers',
-    label: 'Chapter Members',
-    children: [
-      { id: 'officers', label: 'Officers' },
-      { id: 'sirKnights', label: 'Sir Knights' },
-      { id: 'petitioners', label: 'Petitioners' },
-    ],
-  },
-  { id: 'subscribers', label: 'Subscribers' },
-  { id: 'accounts', label: 'Account Management' },
+const baseNavItems: AppNavItem[] = [
+  { id: 'overview', label: 'Overview', group: 'OVERVIEW', icon: navIconFor.overview },
+  { id: 'funds', label: 'Chapter Funds', group: 'OPERATIONS', icon: navIconFor.funds },
+  { id: 'events', label: 'Events', group: 'OPERATIONS', icon: navIconFor.events },
+  { id: 'news', label: 'News', group: 'OPERATIONS', icon: navIconFor.news },
+  { id: 'officers', label: 'Officers', group: 'MANAGEMENT', icon: navIconFor.officers },
+  { id: 'sirKnights', label: 'Sir Knights', group: 'MANAGEMENT', icon: navIconFor.sirKnights },
+  { id: 'petitioners', label: 'Petitioners', group: 'MANAGEMENT', icon: navIconFor.petitioners },
+  { id: 'subscribers', label: 'Subscribers', group: 'MANAGEMENT', icon: navIconFor.subscribers },
+  { id: 'accounts', label: 'Accounts', group: 'MANAGEMENT', icon: navIconFor.accounts },
+  { id: 'settings', label: 'Preferences', group: 'SYSTEM', icon: navIconFor.settings },
 ];
 
 const moduleTitle: Record<LandingSection, string> = {
+  overview: 'Overview',
   funds: 'Chapter Funds',
   events: 'Events',
   officers: 'Officers',
@@ -63,7 +62,32 @@ const moduleTitle: Record<LandingSection, string> = {
   petitioners: 'Petitioners',
   subscribers: 'Subscribers',
   accounts: 'Account Management',
+  settings: 'System Preferences',
 };
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function changePercent(dates: Array<string | undefined>, days = 7) {
+  const now = Date.now();
+  const current = dates.filter((value) => {
+    const time = value ? new Date(value).getTime() : NaN;
+    return time >= now - days * DAY_MS && time <= now;
+  }).length;
+  const previous = dates.filter((value) => {
+    const time = value ? new Date(value).getTime() : NaN;
+    return time >= now - days * 2 * DAY_MS && time < now - days * DAY_MS;
+  }).length;
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return Math.round(((current - previous) / previous) * 100);
+}
+
+function petitionerStatusTone(status: string): DataTableStatus {
+  const value = status.toLowerCase();
+  if (value === 'approved') return 'success';
+  if (value === 'pending') return 'warning';
+  if (value === 'rejected' || value === 'declined') return 'danger';
+  return 'neutral';
+}
 
 const emptyOfficerForm = () => ({
   id: 0,
@@ -104,6 +128,60 @@ type PendingDelete =
 
 type RowItem = EventItem | OfficerItem | NewsItem | PetitionerItem | SubscriberItem;
 
+function PageHeader({
+  eyebrow,
+  title,
+  subtitle,
+  range,
+  onRangeChange,
+  actionLabel,
+  onAction,
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  range: string;
+  onRangeChange: (value: string) => void;
+  actionLabel?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold/70">{eyebrow}</p>
+        <h2 className="mt-1 truncate text-2xl font-semibold tracking-tight text-white/90">{title}</h2>
+        <p className="mt-1 text-sm text-white/40">{subtitle}</p>
+      </div>
+      <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <label className="relative">
+          <span className="sr-only">Date range</span>
+          <select
+            value={range}
+            onChange={(event) => onRangeChange(event.target.value)}
+            className="h-9 appearance-none rounded-xl border border-white/10 bg-white/[0.04] pl-3 pr-8 text-xs font-medium text-white/60 outline-none transition focus:border-gold/30"
+          >
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="all">All time</option>
+          </select>
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-white/35">▾</span>
+        </label>
+        {actionLabel && onAction ? (
+          <button
+            type="button"
+            onClick={onAction}
+            className="admin-btn-primary flex h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(115,14,27,0.28)] transition hover:brightness-110"
+          >
+            <Plus className="h-4 w-4" />
+            {actionLabel}
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function DashboardInner({
   username,
   currentAdminId,
@@ -113,7 +191,8 @@ function DashboardInner({
 }) {
   const { toast } = useAdminToast();
   const { lastReadAt, markAllRead } = useAdminNotifLastRead(username);
-  const [active, setActive] = useState<LandingSection>('funds');
+  const [active, setActive] = useState<LandingSection>('overview');
+  const [dateRange, setDateRange] = useState('30');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebar, setMobileSidebar] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -431,15 +510,6 @@ function DashboardInner({
     [petitioners],
   );
 
-  const statCards = [
-    { label: 'Events', value: events.length },
-    { label: 'Officers', value: officers.length },
-    { label: 'News', value: news.length },
-    { label: 'Sir Knights', value: sirKnights.length },
-    { label: 'Petitioners', value: chapterPetitioners.length },
-    { label: 'Subscribers', value: subscribers.length },
-  ];
-
   const notifUnreadPetitionersCount = useMemo(() => {
     return petitioners.filter((p) => {
       if (p.status.toLowerCase() !== 'pending') return false;
@@ -535,6 +605,106 @@ function DashboardInner({
   })();
 
   const pagedRows = paginate(activeRows);
+
+  const navItems = useMemo(
+    () =>
+      baseNavItems.map((item) => ({
+        ...item,
+        badge:
+          item.id === 'funds'
+            ? notifUnreadOrdersCount
+            : item.id === 'petitioners'
+              ? notifUnreadPetitionersCount
+              : item.id === 'subscribers'
+                ? notifUnreadSubscribersCount
+                : undefined,
+      })),
+    [notifUnreadOrdersCount, notifUnreadPetitionersCount, notifUnreadSubscribersCount],
+  );
+
+  const navigate = useCallback((id: LandingSection) => {
+    setActive(id);
+    setMobileSidebar(false);
+    setPage(1);
+    setSearch('');
+  }, []);
+
+  const refreshDashboard = useCallback(() => {
+    void fetchAll({ silent: true });
+    setFundsRefreshSignal((value) => value + 1);
+  }, [fetchAll]);
+
+  const pendingCount = useMemo(
+    () => chapterPetitioners.filter((item) => item.status.toLowerCase() === 'pending').length,
+    [chapterPetitioners],
+  );
+  const recentSubscriberCount = useMemo(
+    () =>
+      subscribers.filter((item) => {
+        const time = item.date_subscribed ? new Date(item.date_subscribed).getTime() : 0;
+        return time >= Date.now() - 7 * DAY_MS;
+      }).length,
+    [subscribers],
+  );
+  const recentOrderCount = useMemo(
+    () =>
+      campaignOrders.filter((item) => {
+        const time = item.created_at ? new Date(item.created_at).getTime() : 0;
+        return time >= Date.now() - 7 * DAY_MS;
+      }).length,
+    [campaignOrders],
+  );
+
+  const overviewStats = [
+    {
+      label: 'Events',
+      value: events.length,
+      icon: navIconFor.events,
+      trend: changePercent(events.map((item) => item.event_date)),
+      trendLabel: 'vs prior period',
+      spark: [events.length, events.length + recentOrderCount, events.length + news.length],
+      tone: 'gold' as const,
+    },
+    {
+      label: 'Members',
+      value: officers.length + sirKnights.length,
+      icon: navIconFor.officers,
+      trend: 0,
+      trendLabel: 'roster total',
+      spark: [officers.length, sirKnights.length, officers.length + sirKnights.length],
+      tone: 'emerald' as const,
+    },
+    {
+      label: 'Petitions',
+      value: chapterPetitioners.length,
+      icon: navIconFor.petitioners,
+      trend: changePercent(petitioners.map((item) => item.submitted_at)),
+      trendLabel: 'vs prior period',
+      spark: [chapterPetitioners.length, pendingCount, sirKnights.length],
+      tone: 'sky' as const,
+    },
+    {
+      label: 'Subscribers',
+      value: subscribers.length,
+      icon: navIconFor.subscribers,
+      trend: changePercent(subscribers.map((item) => item.date_subscribed)),
+      trendLabel: 'vs prior period',
+      spark: [recentSubscriberCount, subscribers.length, recentSubscriberCount + subscribers.length],
+      tone: 'maroon' as const,
+    },
+  ];
+
+  const recentActivityRows = useMemo(
+    () =>
+      [...petitioners]
+        .sort((a, b) => {
+          const aTime = a.submitted_at ? new Date(a.submitted_at).getTime() : 0;
+          const bTime = b.submitted_at ? new Date(b.submitted_at).getTime() : 0;
+          return bTime - aTime || b.id - a.id;
+        })
+        .slice(0, 12),
+    [petitioners],
+  );
 
   const openEventCreate = () => {
     setEventForm(emptyEventForm());
@@ -834,9 +1004,35 @@ function DashboardInner({
   };
 
   const ac = actionBarConfig();
-  const showPagination = active !== 'funds' && activeRows.length > 0;
+  const showPagination = active !== 'funds' && active !== 'overview' && active !== 'settings' && activeRows.length > 0;
   const rangeStart = activeRows.length === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = Math.min(page * pageSize, activeRows.length);
+  const primaryActionLabel = 'actionLabel' in ac ? ac.actionLabel : undefined;
+  const primaryAction = 'onAction' in ac ? ac.onAction : undefined;
+
+  const topbarProps: TopbarProps = {
+    title: moduleTitle[active],
+    breadcrumbGroup: navItems.find((item) => item.id === active)?.group ?? 'OVERVIEW',
+    username,
+    navItems,
+    onNavigate: navigate,
+    onMenuClick: () => setMobileSidebar(true),
+    onRefresh: refreshDashboard,
+    primaryActionLabel,
+    onPrimaryAction: primaryAction,
+    notificationBadgeTotal: notifUnreadPetitionersCount + notifUnreadSubscribersCount + notifUnreadOrdersCount,
+    petitionerPreviews,
+    subscriberPreviews,
+    tshirtOrderPreviews,
+    onMarkAllRead: markAllRead,
+    onGoToPetitioners: () => navigate('petitioners'),
+    onGoToSubscribers: () => navigate('subscribers'),
+    onGoToTshirtOrders: () => {
+      setFundsTab('orders');
+      setFundsRefreshSignal((value) => value + 1);
+      navigate('funds');
+    },
+  };
 
   if (initialLoading) {
     return (
@@ -859,48 +1055,230 @@ function DashboardInner({
   }
 
   return (
-    <div className="admin-dashboard-bg flex h-[100dvh] overflow-hidden text-foreground font-sans">
-      <AdminSidebar
-        sections={sections}
-        active={active}
-        onSelect={setActive}
-        collapsed={sidebarCollapsed}
-        onToggleCollapsed={() => setSidebarCollapsed((s) => !s)}
-        mobileOpen={mobileSidebar}
-        onMobileOpenChange={setMobileSidebar}
-        chapterName={landing.hero?.title || null}
-        logoUrl={landing.hero?.logo_url || null}
-      />
+    <DashboardLayout
+      sidebar={{
+        items: navItems,
+        active,
+        onSelect: navigate,
+        collapsed: sidebarCollapsed,
+        onToggleCollapsed: () => setSidebarCollapsed((value) => !value),
+        mobileOpen: mobileSidebar,
+        onMobileOpenChange: setMobileSidebar,
+        chapterName: landing.hero?.title || null,
+        logoUrl: landing.hero?.logo_url || null,
+        username,
+      }}
+      topbar={topbarProps}
+    >
+      <div className="space-y-6">
+        {active === 'overview' ? (
+          <>
+            <PageHeader
+              eyebrow="OVERVIEW"
+              title={`Welcome back, ${username.split(' ')[0] || username}`}
+              subtitle="Live operational snapshot across every chapter module."
+              range={dateRange}
+              onRangeChange={setDateRange}
+              actionLabel="Add event"
+              onAction={openEventCreate}
+            />
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <AdminHeader
-          title={moduleTitle[active]}
-          username={username}
-          onMenuClick={() => setMobileSidebar(true)}
-          notificationBadgeTotal={notifUnreadPetitionersCount + notifUnreadSubscribersCount + notifUnreadOrdersCount}
-          petitionerPreviews={petitionerPreviews}
-          subscriberPreviews={subscriberPreviews}
-          tshirtOrderPreviews={tshirtOrderPreviews}
-          onMarkAllRead={markAllRead}
-          onGoToPetitioners={() => {
-            setActive('petitioners');
-            setMobileSidebar(false);
-          }}
-          onGoToSubscribers={() => {
-            setActive('subscribers');
-            setMobileSidebar(false);
-          }}
-          onGoToTshirtOrders={() => {
-            setFundsTab('orders');
-            setFundsRefreshSignal((value) => value + 1);
-            setActive('funds');
-            setMobileSidebar(false);
-          }}
-        />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {overviewStats.map((stat) => (
+                <StatCard key={stat.label} {...stat} />
+              ))}
+            </div>
 
-        <div className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-[1600px] space-y-6 px-4 py-6 md:space-y-8 md:px-8 md:py-8 lg:px-10">
-            {active === 'funds' ? (
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+              <section className="admin-panel rounded-2xl p-5 xl:col-span-8">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold tracking-tight text-white/90">Activity volume</p>
+                    <p className="mt-0.5 text-xs text-white/40">Records currently tracked across core modules</p>
+                  </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gold/20 bg-gold/10 text-gold">
+                    <TrendingUp className="h-4 w-4" aria-hidden />
+                  </span>
+                </div>
+                <div className="mt-6 flex h-40 items-end gap-2 sm:gap-3">
+                  {[
+                    { label: 'Events', value: events.length },
+                    { label: 'News', value: news.length },
+                    { label: 'Petitions', value: chapterPetitioners.length },
+                    { label: 'Subscribers', value: subscribers.length },
+                    { label: 'Orders', value: campaignOrders.length },
+                    { label: 'Accounts', value: adminUsers.length },
+                  ].map((item) => {
+                    const max = Math.max(
+                      1,
+                      events.length,
+                      news.length,
+                      chapterPetitioners.length,
+                      subscribers.length,
+                      campaignOrders.length,
+                      adminUsers.length,
+                    );
+                    return (
+                      <div key={item.label} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
+                        <span className="text-[11px] font-medium tabular-nums text-white/55">{item.value}</span>
+                        <div className="flex h-full w-full items-end">
+                          <div
+                            className="w-full rounded-t-lg bg-gradient-to-t from-maroon/70 to-gold/70 transition-all duration-300"
+                            style={{ height: `${Math.max(8, (item.value / max) * 100)}%` }}
+                          />
+                        </div>
+                        <span className="truncate text-[9px] uppercase tracking-[0.12em] text-white/30 sm:text-[10px]">
+                          {item.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className="admin-panel rounded-2xl p-5 xl:col-span-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold tracking-tight text-white/90">Needs attention</p>
+                    <p className="mt-0.5 text-xs text-white/40">Items that may require action</p>
+                  </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 text-amber-300">
+                    <Activity className="h-4 w-4" aria-hidden />
+                  </span>
+                </div>
+                <div className="mt-5 space-y-2">
+                  {[
+                    { label: 'Pending petitions', value: pendingCount, target: 'petitioners' as LandingSection },
+                    { label: 'New subscribers', value: recentSubscriberCount, target: 'subscribers' as LandingSection },
+                    { label: 'Recent orders', value: recentOrderCount, target: 'funds' as LandingSection },
+                  ].map((item) => {
+                    const Icon = navIconFor[item.target];
+                    return (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => navigate(item.target)}
+                        className="flex w-full items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.025] px-3 py-3 text-left transition hover:border-gold/20 hover:bg-white/[0.05]"
+                      >
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-gold/80">
+                          <Icon className="h-4 w-4" aria-hidden />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-xs text-white/60">{item.label}</span>
+                        <span className="text-sm font-semibold tabular-nums text-white/85">{item.value}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
+
+            <DataTable
+              title="Recent member activity"
+              description="Latest petitions submitted across the chapter"
+              rows={recentActivityRows}
+              searchPlaceholder="Search petitions…"
+              pageSize={6}
+              emptyTitle="No petitions yet"
+              emptyDescription="Member petitions will appear here as they are submitted."
+              getRowId={(row) => row.id}
+              getRowSearchText={(row) => `${row.name} ${row.email} ${row.school} ${row.status}`}
+              filters={[
+                { value: 'pending', label: 'Pending', predicate: (row) => row.status.toLowerCase() === 'pending' },
+                { value: 'approved', label: 'Approved', predicate: (row) => row.status.toLowerCase() === 'approved' },
+              ]}
+              columns={[
+                {
+                  key: 'name',
+                  header: 'Member',
+                  sortable: true,
+                  render: (row) => (
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-gold/20 bg-gold/10 text-[11px] font-bold text-gold">
+                        {row.name.trim().charAt(0).toUpperCase() || '?'}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-medium text-white/85">{row.name}</span>
+                        <span className="block truncate text-[11px] text-white/35">{row.email}</span>
+                      </span>
+                    </div>
+                  ),
+                },
+                { key: 'school', header: 'School', sortable: true },
+                {
+                  key: 'status',
+                  header: 'Status',
+                  sortable: true,
+                  render: (row) => <StatusPill tone={petitionerStatusTone(row.status)}>{row.status}</StatusPill>,
+                },
+                {
+                  key: 'submitted_at',
+                  header: 'Submitted',
+                  sortable: true,
+                  value: (row) => (row.submitted_at ? new Date(row.submitted_at).getTime() : 0),
+                  render: (row) => (
+                    <span className="text-xs tabular-nums text-white/50">
+                      {row.submitted_at ? new Date(row.submitted_at).toLocaleDateString() : '—'}
+                    </span>
+                  ),
+                },
+              ]}
+              renderRowActions={(row) => (
+                <button
+                  type="button"
+                  onClick={() => navigate('petitioners')}
+                  className="rounded-lg border border-white/10 px-2.5 py-1 text-[11px] font-semibold text-white/50 transition hover:border-gold/25 hover:text-gold"
+                >
+                  Open #{row.id}
+                </button>
+              )}
+            />
+          </>
+        ) : active === 'settings' ? (
+          <>
+            <PageHeader
+              eyebrow="SYSTEM"
+              title="System preferences"
+              subtitle="Display, service health, and dashboard controls."
+              range={dateRange}
+              onRangeChange={setDateRange}
+            />
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <section className="admin-panel rounded-2xl p-5 lg:col-span-2">
+                <p className="text-sm font-semibold text-white/90">Appearance</p>
+                <p className="mt-1 text-xs text-white/40">Switch between the dark operational theme and the light parity theme.</p>
+                <div className="mt-5 flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.025] p-4">
+                  <ThemeToggle />
+                  <div>
+                    <p className="text-sm font-medium text-white/75">Theme mode</p>
+                    <p className="text-[11px] text-white/35">Applies across the public site and admin workspace.</p>
+                  </div>
+                </div>
+              </section>
+              <section className="admin-panel rounded-2xl p-5">
+                <p className="text-sm font-semibold text-white/90">Service health</p>
+                <p className="mt-1 text-xs text-white/40">Current admin workspace status.</p>
+                <div className="mt-5 flex items-center gap-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-4">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-emerald-300">All systems online</p>
+                    <p className="text-[11px] text-white/35">Data endpoints responding</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={refreshDashboard}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-2.5 text-xs font-semibold text-white/60 transition hover:border-gold/25 hover:text-gold"
+                >
+                  <Activity className="h-4 w-4" />
+                  Refresh data
+                </button>
+              </section>
+            </div>
+          </>
+        ) : active === 'funds' ? (
               <FundsWorkspace
                 toast={toast}
                 chapterName={landing.hero?.title || null}
@@ -925,7 +1303,11 @@ function DashboardInner({
                     </h2>
                     <p className="text-foreground/50 text-xs">Across all modules · updates automatically</p>
                   </div>
-                  <AdminStatsCards items={statCards} />
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    {overviewStats.map((stat) => (
+                      <StatCard key={stat.label} {...stat} />
+                    ))}
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -1326,8 +1708,6 @@ function DashboardInner({
             ) : null}
               </>
             )}
-          </div>
-        </div>
       </div>
 
       <DashboardModal
@@ -1760,7 +2140,7 @@ function DashboardInner({
         loading={deleteLoading}
         onConfirm={runDelete}
       />
-    </div>
+    </DashboardLayout>
   );
 }
 
