@@ -19,6 +19,12 @@ const AUTO_SPEED = 0.22;
 const IDLE_RESUME_MS = 4000;
 /** The spiral widens with the screen up to this width (px); beyond it the room just gets wider. */
 const MAX_SPIRAL_WIDTH = 1240;
+/** Section-height fractions: where the candle's base and flame appear, the scene's top offset, and the
+    stage's perspective origin (kept in sync with `.officer-stage` in globals.css). */
+const CANDLE_BASE = 0.77;
+const CANDLE_FLAME = 0.36;
+const SCENE_TOP = 0.46;
+const PERSPECTIVE_ORIGIN_Y = 0.2;
 /** CSS perspective distance of the stage (px); also used to size the spiral to the stage width. */
 const PERSPECTIVE = 1800;
 
@@ -110,7 +116,16 @@ export default function OfficersCarousel({ officers, children }: { officers: Off
       stage.style.setProperty('--card-w', `${cardW}px`);
       stage.style.setProperty('--card-h', `${cardH}px`);
       stage.style.setProperty('--strip-w', `${stripW + 0.6}px`); // slight overlap hides seams
-      scene.style.transform = `translateZ(${-radius}px) rotateX(-10deg) rotateZ(-9deg)`;
+      scene.style.transform = `translateZ(${-radius}px)`; // upright: no tilt on the cards or the candle
+
+      // Anchor the candle: its base lands at CANDLE_BASE and its flame at CANDLE_FLAME (fractions of the
+      // section height). Perspective shrinks the scene toward the stage's perspective origin, so solve in css px.
+      const stageH = stage.clientHeight;
+      const shrink = PERSPECTIVE / (PERSPECTIVE + radius);
+      const dropPx = ((CANDLE_BASE - PERSPECTIVE_ORIGIN_Y) * stageH) / shrink - (SCENE_TOP - PERSPECTIVE_ORIGIN_Y) * stageH;
+      const candleH = ((CANDLE_BASE - CANDLE_FLAME) * stageH) / shrink;
+      stage.style.setProperty('--candle-h', `${candleH}px`);
+      stage.style.setProperty('--candle-drop', `${dropPx}px`);
 
       let bestJ = 0;
       let bestOff = Infinity;
@@ -193,7 +208,7 @@ export default function OfficersCarousel({ officers, children }: { officers: Off
         onPointerCancel={onPointerUp}
       >
         <div className="officer-candle-light pointer-events-none absolute inset-0" aria-hidden />
-        <div ref={sceneRef} className="officer-scene absolute left-1/2 top-[55%] h-0 w-0">
+        <div ref={sceneRef} className="officer-scene absolute left-1/2 h-0 w-0" style={{ top: `${SCENE_TOP * 100}%` }}>
           {cards.map(({ key, officer: o, index }, j) =>
             Array.from({ length: STRIPS }, (_, k) => (
               <div

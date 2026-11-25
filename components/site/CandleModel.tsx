@@ -4,8 +4,13 @@ import { useEffect, useRef } from 'react';
 
 /** Candle GLB: Blender export with an emissive flame mesh and its flicker animation built in. */
 const CANDLE_GLB = '/models/candle.glb';
-/** Flame tip height in model units (bounds: wax 0–0.16, flame up to ~0.2). */
-const FLAME_Y = 0.17;
+/** Wax height in model units (the wax spans 0–0.16, flame tip ~0.2) and how much taller to stretch it. */
+const WAX_HEIGHT = 0.16;
+const WAX_STRETCH = 2.4;
+/** Turns the model so its best face (the smooth, ivory side, as in the reference) looks at the camera. */
+const FRONT_ROTATION_Y = -Math.PI / 2;
+/** Flame tip height in model units, after stretching. */
+const FLAME_Y = 0.17 + WAX_HEIGHT * (WAX_STRETCH - 1);
 /** Flame mesh brightness (the file sets 16, which clips to white) and the warm point light's strength. */
 const FLAME_EMISSIVE = 2.2;
 const FLAME_LIGHT = 0.06;
@@ -40,16 +45,16 @@ export default function CandleModel() {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
+      renderer.toneMappingExposure = 1.15;
       renderer.domElement.className = 'h-full w-full opacity-0 transition-opacity duration-700';
       host.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(28, 1, 0.01, 10);
 
-      scene.add(new THREE.AmbientLight(0xffe2c4, 0.35));
-      const fill = new THREE.DirectionalLight(0xffd2a8, 0.6);
-      fill.position.set(-0.4, 0.5, 0.6);
+      scene.add(new THREE.AmbientLight(0xfff7ea, 0.6));
+      const fill = new THREE.DirectionalLight(0xfff3e2, 0.85);
+      fill.position.set(-0.3, 0.6, 0.8);
       scene.add(fill);
       // The model is ~16 cm tall, so the flame light is small and falls off gently (decay 1).
       const flameLight = new THREE.PointLight(0xffa45c, FLAME_LIGHT, 0.6, 1);
@@ -69,6 +74,18 @@ export default function CandleModel() {
         return;
       }
       scene.add(gltf.scene);
+      gltf.scene.rotation.y = FRONT_ROTATION_Y;
+      // Stand-on-the-floor candle: stretch only the wax upward from its base, and lift the flame (a
+      // separate node with its own animation) by the same amount so it still sits on the wick.
+      const wax = gltf.scene.getObjectByName('Candle');
+      const flameGroup = new THREE.Group();
+      flameGroup.position.y = WAX_HEIGHT * (WAX_STRETCH - 1);
+      gltf.scene.add(flameGroup);
+      ['Candle_Light', 'Candle_Light_Emitt'].forEach((name) => {
+        const node = gltf.scene.getObjectByName(name);
+        if (node) flameGroup.add(node);
+      });
+      if (wax) wax.scale.y = WAX_STRETCH;
       // Transmissive wax renders the transparent canvas behind it as white, so keep the wax opaque;
       // and the flame's 16x emissive strength burns out to white under tone mapping, so tame it.
       gltf.scene.traverse((obj) => {
@@ -97,9 +114,9 @@ export default function CandleModel() {
         // Fit the whole candle (with margin), seen from slightly above like the carousel's tilt.
         const halfFov = (camera.fov * Math.PI) / 360;
         const distance =
-          Math.max(size.y / 2 / Math.tan(halfFov), size.x / 2 / (Math.tan(halfFov) * camera.aspect)) * 1.12 +
+          Math.max(size.y / 2 / Math.tan(halfFov), size.x / 2 / (Math.tan(halfFov) * camera.aspect)) * 1.05 +
           size.z / 2;
-        const elevation = (12 * Math.PI) / 180;
+        const elevation = (16 * Math.PI) / 180;
         camera.position.set(center.x, center.y + Math.sin(elevation) * distance, center.z + Math.cos(elevation) * distance);
         camera.lookAt(center);
       };

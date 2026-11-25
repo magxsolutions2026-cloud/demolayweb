@@ -914,7 +914,7 @@ html[data-theme="light"] .nav-wing {
   --card-h: 243px;
   --strip-w: 48px;
   perspective: 1800px; /* kept in sync with PERSPECTIVE in OfficersCarousel.tsx */
-  perspective-origin: 50% 20%;
+  perspective-origin: 50% 20%; /* kept in sync with PERSPECTIVE_ORIGIN_Y in OfficersCarousel.tsx */
 }
 
 .officer-scene,
@@ -1047,7 +1047,7 @@ html[data-theme="light"] .nav-wing {
 /* Lighting on the floor: spotlight sheen in the middle, dark corners, warm candle pool at its base. */
 .officer-floor-glow {
   background:
-    radial-gradient(ellipse 16% 7% at 50% 71%, rgba(255, 170, 80, 0.32), transparent 70%),
+    radial-gradient(ellipse 18% 6% at 50% 77%, rgba(255, 170, 80, 0.34), transparent 70%),
     radial-gradient(ellipse 40% 26% at 50% 74%, rgba(255, 255, 255, 0.1), transparent 70%),
     radial-gradient(ellipse 80% 70% at 50% 78%, transparent 40%, rgba(0, 0, 0, 0.82) 100%),
     linear-gradient(180deg, transparent 59%, rgba(0, 0, 0, 0.55) 62%, transparent 70%),
@@ -1057,17 +1057,37 @@ html[data-theme="light"] .nav-wing {
 
 /* Warm light thrown by the flame onto the stage. */
 .officer-candle-light {
-  background: radial-gradient(ellipse 40% 50% at 50% 30%, rgba(255, 168, 76, 0.24), transparent 70%);
+  background: radial-gradient(ellipse 40% 50% at 50% 48%, rgba(255, 168, 76, 0.24), transparent 70%);
   animation: candleGlow 2.8s ease-in-out infinite;
 }
 
-/* Box for the 3D candle (CandleModel); placed so the candle stands on the floor below the horizon. */
+/* Box for the 3D candle (CandleModel), which fits the model to its full height: the box's bottom edge is
+   where the candle stands on the floor, its top edge is the flame. --candle-h / --candle-drop are set in JS. */
 .officer-candle {
-  width: calc(var(--card-h) * 0.95);
-  height: calc(var(--card-h) * 1.9);
-  left: calc(var(--card-h) * -0.475);
-  bottom: calc(var(--card-h) * -1.2);
+  --candle-h: 320px;
+  --candle-drop: 260px;
+  width: calc(var(--candle-h) * 0.5);
+  height: var(--candle-h);
+  left: calc(var(--candle-h) * -0.25);
+  bottom: calc(var(--candle-drop) * -1);
   pointer-events: none;
+  isolation: isolate;
+}
+
+/* Contact shadow: dark where the wax meets the marble, with a warm pool of flame light spreading out. */
+.officer-candle::before {
+  content: "";
+  position: absolute;
+  left: -45%;
+  right: -45%;
+  bottom: -2%;
+  height: 11%;
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 30% 55% at 50% 50%, rgba(0, 0, 0, 0.85), transparent 100%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 170, 80, 0.3), transparent 100%);
+  filter: blur(3px);
 }
 
 .officer-focus-in {
