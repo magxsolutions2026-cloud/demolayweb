@@ -769,3 +769,329 @@ html[data-theme="light"] .nav-wing {
   background: radial-gradient(ellipse 90% 55% at 50% -25%, rgba(212, 175, 55, 0.12), transparent 55%);
 }
 
+/* —— Intro loader (PageIntroLoader.tsx): overdrive-style gauge in chapter gold → crimson —— */
+.intro-loader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 50%, rgba(115, 14, 27, 0.28), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+/* Angled panel: cut top-left and bottom-right corners, gold edge on top, crimson edge below. */
+.intro-panel {
+  --cut: 16px;
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  background:
+    linear-gradient(135deg, rgba(212, 175, 55, 0.9) 0 calc(var(--cut) * 0.72), transparent 0) top left / 40% 40% no-repeat,
+    linear-gradient(315deg, rgba(255, 59, 78, 0.9) 0 calc(var(--cut) * 0.72), transparent 0) bottom right / 40% 40% no-repeat,
+    linear-gradient(180deg, rgba(26, 12, 16, 0.96), rgba(12, 8, 11, 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 175, 55, 0.35),
+    inset 0 -1px 0 rgba(255, 59, 78, 0.6);
+}
+
+.intro-panel-shake {
+  animation: introShake 0.42s steps(2, end);
+}
+
+@keyframes introShake {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Glitching stage label: two offset color copies sliced by clip-path. */
+.intro-glitch {
+  position: relative;
+  text-shadow: -1px 0 rgba(255, 59, 78, 0.8), 1px 0 rgba(255, 235, 160, 0.6);
+  animation: introGlitchIn 0.16s steps(3, end);
+}
+
+.intro-glitch::before,
+.intro-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.intro-glitch::before {
+  color: #ff3b4e;
+  transform: translateX(-2px);
+  clip-path: inset(10% 0 58% 0);
+  animation: introSlice 1.6s steps(1, end) infinite;
+}
+
+.intro-glitch::after {
+  color: #fff1bf;
+  transform: translateX(2px);
+  clip-path: inset(62% 0 8% 0);
+  animation: introSlice 1.3s steps(1, end) infinite reverse;
+}
+
+@keyframes introGlitchIn {
+  0% { opacity: 0.35; transform: translateX(-6px) skewX(-12deg); }
+  50% { opacity: 1; transform: translateX(3px) skewX(8deg); }
+  100% { transform: none; }
+}
+
+@keyframes introSlice {
+  0% { clip-path: inset(10% 0 58% 0); }
+  25% { clip-path: inset(48% 0 30% 0); }
+  50% { clip-path: inset(70% 0 6% 0); }
+  75% { clip-path: inset(24% 0 52% 0); }
+  100% { clip-path: inset(10% 0 58% 0); }
+}
+
+.intro-track {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0 6px, transparent 6px 12px),
+    rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.22);
+}
+
+/* Stage ticks drawn over both the fill and the empty track. */
+.intro-tick {
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 1px 0 0 rgba(212, 175, 55, 0.28);
+}
+
+/* Hazard-striped fill whose stripes keep moving; color runs gold → amber → crimson along the bar. */
+.intro-fill {
+  background:
+    repeating-linear-gradient(115deg, rgba(0, 0, 0, 0.28) 0 7px, transparent 7px 14px),
+    linear-gradient(90deg, #e9c64f 0%, #f0a43a 55%, #ff3b4e 100%);
+  background-size: 28px 100%, 100% 100%;
+  animation: introStripes 0.6s linear infinite;
+}
+
+@keyframes introStripes {
+  to { background-position: 28px 0, 0 0; }
+}
+
+/* Chromatic ghost trailing the handle. */
+.intro-trail {
+  background: linear-gradient(90deg, transparent, rgba(255, 59, 78, 0.45));
+  transform: translateX(-6px) skewX(-20deg);
+  mix-blend-mode: screen;
+}
+
+.intro-handle {
+  background: linear-gradient(180deg, #fff1bf, #e9c64f 45%, #ff3b4e);
+  transform: skewX(-20deg);
+  box-shadow: -3px 0 0 rgba(255, 59, 78, 0.55), 3px 0 0 rgba(255, 241, 191, 0.35);
+}
+
+.intro-arcs path {
+  fill: none;
+  stroke: #fff1bf;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px #ff3b4e);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-glitch,
+  .intro-glitch::before,
+  .intro-glitch::after,
+  .intro-fill,
+  .intro-panel-shake {
+    animation: none;
+  }
+}
+
+/* —— Officers carousel (OfficersCarousel.tsx): officers on a turning 3D spiral around a lit candle —— */
+.officer-stage {
+  --card-w: 190px;
+  --card-h: 243px;
+  --strip-w: 48px;
+  perspective: 1800px; /* kept in sync with PERSPECTIVE in OfficersCarousel.tsx */
+  perspective-origin: 50% 20%;
+}
+
+.officer-scene,
+.officer-strip {
+  transform-style: preserve-3d;
+}
+
+/* A card is 4 strips laid on the spiral's cylinder (OfficersCarousel STRIPS); each strip shows its slice. */
+.officer-strip {
+  width: var(--strip-w);
+  height: var(--card-h);
+  left: calc(var(--strip-w) / -2);
+  top: calc(var(--card-h) / -2);
+}
+
+.officer-strip-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* --lit runs from 1 (facing the viewer and the candle) to -1 (turned away); set per frame in JS. */
+.officer-strip-front {
+  background: linear-gradient(180deg, rgba(30, 18, 20, 0.96), rgba(14, 10, 12, 0.98));
+  box-shadow: inset 0 1px 0 rgba(212, 175, 55, 0.3), inset 0 -1px 0 rgba(212, 175, 55, 0.18);
+  filter: brightness(calc(0.25 + 0.75 * max(var(--lit, 1), 0)));
+}
+
+/* Warm candlelight washing up from below (vertical only, so it stays continuous across strips). */
+.officer-strip-front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(255, 170, 80, 0.26), transparent 55%);
+  opacity: max(var(--lit, 1), 0);
+  animation: candleGlow 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Colored rim on the card's outer edges, picked up as it turns. */
+.officer-strip-first .officer-strip-front {
+  border-radius: 12px 0 0 12px;
+  box-shadow:
+    inset 2px 0 0 rgba(233, 198, 79, 0.9),
+    inset 7px 0 10px -4px rgba(255, 59, 78, 0.55),
+    inset 0 1px 0 rgba(212, 175, 55, 0.3);
+}
+
+.officer-strip-last .officer-strip-front {
+  border-radius: 0 12px 12px 0;
+  box-shadow:
+    inset -2px 0 0 rgba(233, 198, 79, 0.9),
+    inset -7px 0 10px -4px rgba(255, 59, 78, 0.55),
+    inset 0 1px 0 rgba(212, 175, 55, 0.3);
+}
+
+.officer-card-content {
+  position: absolute;
+  top: 0;
+  left: calc(var(--strip-k) * var(--card-w) / -4);
+  width: var(--card-w);
+  height: 100%;
+  padding: 8px;
+}
+
+/* Back of the card: the DeMolay emblem, sliced across strips (mirrored, since we see it from behind). */
+.officer-strip-back {
+  transform: rotateY(180deg);
+  background:
+    url("/images/demolay-emblem.png") calc(var(--card-w) * 0.25 - (3 - var(--strip-k)) * var(--card-w) / 4) 50% /
+      calc(var(--card-w) * 0.5) auto no-repeat,
+    linear-gradient(180deg, #2a0f15, #120809);
+  filter: brightness(calc(0.22 + 0.55 * max(var(--lit, 1) * -1, 0)));
+}
+
+.officer-strip-first .officer-strip-back {
+  border-radius: 0 12px 12px 0;
+}
+
+.officer-strip-last .officer-strip-back {
+  border-radius: 12px 0 0 12px;
+}
+
+/* The officers section stays dark in both themes, so its text tokens are pinned to dark-theme values. */
+.officer-section {
+  --foreground: #f5f5f5;
+  --background: #0a0a0a;
+}
+
+/* Room behind the spiral: wall + 3D checkered floor. Horizon sits at 61% of the section height. */
+.officer-room {
+  overflow: hidden;
+  background: #050505;
+  perspective: 700px;
+  perspective-origin: 50% 61%;
+}
+
+/* Back wall: dark plaster, lit by a soft spotlight cone from above. */
+.officer-wall {
+  bottom: 39%;
+  background:
+    radial-gradient(ellipse 26% 95% at 50% -8%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 55%, transparent 75%),
+    radial-gradient(ellipse 70% 120% at 50% 100%, rgba(255, 255, 255, 0.05), transparent 70%),
+    linear-gradient(180deg, #0b0b0b, #141414 70%, #0e0e0e);
+}
+
+/* Floor: checkerboard of light and dark marble tiles laid flat and running off to the horizon. */
+.officer-floor {
+  left: -150%;
+  right: -150%;
+  top: 61%;
+  height: 420%;
+  transform-origin: 50% 0;
+  transform: rotateX(82deg);
+  background:
+    /* stone grain */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.55 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>"),
+    /* thin grout lines */
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(0deg, rgba(0, 0, 0, 0.55) 1px, transparent 1px) 0 0 / 64px 64px,
+    conic-gradient(#cfccc4 0 25%, #161616 0 50%, #cfccc4 0 75%, #161616 0) 0 0 / 128px 128px;
+  background-blend-mode: overlay, normal, normal, normal;
+  /* Fade into darkness toward the horizon and the sides. */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 10%, #000 34%);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 10%, #000 34%);
+}
+
+/* Lighting on the floor: spotlight sheen in the middle, dark corners, warm candle pool at its base. */
+.officer-floor-glow {
+  background:
+    radial-gradient(ellipse 16% 7% at 50% 71%, rgba(255, 170, 80, 0.32), transparent 70%),
+    radial-gradient(ellipse 40% 26% at 50% 74%, rgba(255, 255, 255, 0.1), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 78%, transparent 40%, rgba(0, 0, 0, 0.82) 100%),
+    linear-gradient(180deg, transparent 59%, rgba(0, 0, 0, 0.55) 62%, transparent 70%),
+    /* darken the bottom so the officer name and controls stay readable over the tiles */
+    linear-gradient(180deg, transparent 72%, rgba(0, 0, 0, 0.78) 96%);
+}
+
+/* Warm light thrown by the flame onto the stage. */
+.officer-candle-light {
+  background: radial-gradient(ellipse 40% 50% at 50% 30%, rgba(255, 168, 76, 0.24), transparent 70%);
+  animation: candleGlow 2.8s ease-in-out infinite;
+}
+
+/* Box for the 3D candle (CandleModel); placed so the candle stands on the floor below the horizon. */
+.officer-candle {
+  width: calc(var(--card-h) * 0.95);
+  height: calc(var(--card-h) * 1.9);
+  left: calc(var(--card-h) * -0.475);
+  bottom: calc(var(--card-h) * -1.2);
+  pointer-events: none;
+}
+
+.officer-focus-in {
+  animation: officerFocusIn 0.35s ease-out;
+}
+
+@keyframes officerFocusIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes candleGlow {
+  0%, 100% { opacity: 0.85; }
+  20% { opacity: 1; }
+  35% { opacity: 0.78; }
+  55% { opacity: 0.96; }
+  70% { opacity: 0.82; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .officer-candle-light,
+  .officer-strip-front::after {
+    animation: none;
+  }
+}
