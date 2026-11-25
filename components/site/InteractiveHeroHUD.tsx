@@ -61,14 +61,6 @@ export default function InteractiveHeroHUD() {
       {/* ======================================================== */}
       <div className="relative z-20 hidden flex-col items-start justify-end gap-8 md:flex">
         <div className="max-w-xl text-left">
-          {/* Eyebrow Label */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-black/35 px-3 py-1 backdrop-blur-xl">
-            <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#d4af37]" />
-            <p className={`${orbitron.className} text-[10px] font-bold uppercase tracking-[0.26em] text-gold/90 sm:text-xs`}>
-              Order of DeMolay · Founded 1921
-            </p>
-          </div>
-
           {/* Luxury Perimeter Heading */}
           <h1 className={`${orbitron.className} mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl`}>
             T. De Leon <br />

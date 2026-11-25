@@ -3,10 +3,8 @@ import InteractiveHeroHUD from '@/components/site/InteractiveHeroHUD';
 import HomeConnect from '@/components/site/home/HomeConnect';
 import HomeGlobe from '@/components/site/home/HomeGlobe';
 import HomeHappenings from '@/components/site/home/HomeHappenings';
-import HomeIntro from '@/components/site/home/HomeIntro';
 import HomeJoinBand from '@/components/site/home/HomeJoinBand';
 import HomeOfficers from '@/components/site/home/HomeOfficers';
-import HomeStatStrip from '@/components/site/home/HomeStatStrip';
 import HomeVirtues from '@/components/site/home/HomeVirtues';
 import type { HomeData } from '@/lib/homeData';
 
@@ -25,8 +23,6 @@ export default function HomePageSections({ data }: { data: HomeData }) {
       </section>
 
       <div className="relative z-10 w-full">
-        <HomeStatStrip />
-        <HomeIntro />
         <HomeVirtues />
         <HomeHappenings events={data.events} news={data.news} />
         <HomeGlobe />
