@@ -1,3 +1,5 @@
+import type React from 'react';
+import { Orbitron } from 'next/font/google';
 import HomeHeroVideoDynamic from '@/components/site/HomeHeroVideoDynamic';
 import InteractiveHeroHUD from '@/components/site/InteractiveHeroHUD';
 import HomeConnect from '@/components/site/home/HomeConnect';
@@ -8,13 +10,19 @@ import HomeOfficers from '@/components/site/home/HomeOfficers';
 import HomeVirtues from '@/components/site/home/HomeVirtues';
 import type { HomeData } from '@/lib/homeData';
 
+const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '500', '600', '700', '800'], variable: '--font-orbitron' });
+
 /**
  * Entire home route layout, told as a story: hero, who we are, virtues, what's happening, the wider
  * Philippine jurisdiction, officers, how to join, and where to find us. Sections live in components/site/home.
  */
 export default function HomePageSections({ data }: { data: HomeData }) {
   return (
-    <main className="relative">
+    <main
+      className={`${orbitron.variable} relative`}
+      // Point every font utility (serif, sans, mono) at Orbitron for the whole landing page.
+      style={{ '--font-serif': 'var(--font-orbitron)', '--font-sans': 'var(--font-orbitron)', '--font-mono': 'var(--font-orbitron)', fontFamily: 'var(--font-orbitron)' } as React.CSSProperties}
+    >
       <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[100dvh] w-full overflow-hidden" aria-hidden>
         <HomeHeroVideoDynamic />
       </div>
