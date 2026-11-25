@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-export default function AdminModal() {
+export default function AdminModal({ variant = 'text' }: { variant?: 'text' | 'avatar' }) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -227,13 +227,24 @@ export default function AdminModal() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openModal}
-        className="rounded-lg border border-transparent px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-foreground/80 transition duration-300 hover:border-gold/30 hover:bg-gold/10 hover:text-gold"
-      >
-        Admin
-      </button>
+      {variant === 'avatar' ? (
+        <button
+          type="button"
+          onClick={openModal}
+          aria-label="Admin login"
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-white/35 bg-[#2a0b12] text-gold transition duration-300 hover:border-gold/70 hover:shadow-[0_0_14px_rgba(212,175,55,0.35)]"
+        >
+          <Lock className="h-3.5 w-3.5" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={openModal}
+          className="rounded-lg border border-transparent px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-foreground/80 transition duration-300 hover:border-gold/30 hover:bg-gold/10 hover:text-gold"
+        >
+          Admin
+        </button>
+      )}
 
       {/* Render via React Portal so it breaks free from Navbar's transform stacking context */}
       {mounted ? createPortal(modalContent, document.body) : null}
