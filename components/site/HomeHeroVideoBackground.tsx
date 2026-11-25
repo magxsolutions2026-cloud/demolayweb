@@ -9,6 +9,8 @@ const REVERSE_VIDEO_SRC = '/hero-background-reverse.mp4';
 const IDLE_VIDEO_SRC = '/hero-idle.mp4';
 const EDGE_EPSILON = 0.04;
 const CROSSFADE_MS = 260;
+/** Swap forward/reverse anyway if the incoming video reports no painted frame in this time. */
+const SWAP_FALLBACK_MS = 150;
 const HERO_ORBIT_EXTRA_VIEWPORTS = 0.35;
 
 type ScrollDirection = 'down' | 'up';
@@ -85,6 +87,8 @@ export default function HomeHeroVideoBackground() {
   const lastScrollYRef = useRef(0);
   const lastTouchYRef = useRef<number | null>(null);
   const pauseHiddenLayerTimerRef = useRef<number | null>(null);
+  /** Identifies the latest pending forward/reverse swap; older swaps see a stale token and do nothing. */
+  const swapTokenRef = useRef(0);
   const [isAtTop, setIsAtTop] = useState(true);
   const [idleGateReady, setIdleGateReady] = useState(true);
   const [idleReady, setIdleReady] = useState(false);
@@ -151,7 +155,42 @@ export default function HomeHeroVideoBackground() {
       }, CROSSFADE_MS);
     };
 
+    /** Forward and reverse show the same story frame at the hand-off, so cut between them instead of fading. */
+    const swapInstantly = (layer: VideoLayer) => {
+      forward.style.transitionDuration = '0ms';
+      reverse.style.transitionDuration = '0ms';
+      setVisible(layer);
+      // Restore the class's fade (still used for idle <-> forward) once the opacity change has been applied.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          forward.style.transitionDuration = '';
+          reverse.style.transitionDuration = '';
+        }),
+      );
+    };
+
+    /** Shows `layer` as soon as it has painted a frame, so the old frame never freezes while the new one fades in. */
+    const swapWhenPainted = (layer: VideoLayer) => {
+      if (visibleLayerRef.current === layer) return;
+
+      const incoming = layer === 'forward' ? forward : reverse;
+      swapTokenRef.current += 1;
+      const token = swapTokenRef.current;
+      let done = false;
+      const run = () => {
+        if (done || token !== swapTokenRef.current) return;
+        done = true;
+        swapInstantly(layer);
+      };
+
+      if ('requestVideoFrameCallback' in incoming) {
+        incoming.requestVideoFrameCallback(run);
+      }
+      window.setTimeout(run, SWAP_FALLBACK_MS);
+    };
+
     const resetToStart = () => {
+      swapTokenRef.current += 1;
       clearPauseTimer();
       pauseBoth();
       syncBothLayers(0);
@@ -165,6 +204,7 @@ export default function HomeHeroVideoBackground() {
       const duration = getPlayableDuration(forward, reverse);
       if (duration <= 0) return;
 
+      swapTokenRef.current += 1;
       clearPauseTimer();
       pauseBoth();
       syncBothLayers(duration);
@@ -204,7 +244,7 @@ export default function HomeHeroVideoBackground() {
       syncBothLayers(storyTime);
       activeLayerRef.current = layer;
       playbackPhaseRef.current = layer === 'forward' ? 'playing-forward' : 'playing-reverse';
-      setVisible(layer);
+      swapWhenPainted(layer);
       void playLayer(layer);
     };
 
@@ -382,6 +422,7 @@ export default function HomeHeroVideoBackground() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      swapTokenRef.current += 1;
       clearPauseTimer();
       pauseBoth();
     };
