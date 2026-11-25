@@ -852,8 +852,9 @@ html[data-theme="light"] .admin-data-shell {
 }
 
 .nav-notch-side {
-  background: linear-gradient(180deg, rgba(115, 14, 27, 0.42), rgba(60, 8, 16, 0.55));
+  background: linear-gradient(180deg, rgba(115, 14, 27, 0.55), rgba(70, 10, 20, 0.7));
   border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   transition: background 0.4s ease, backdrop-filter 0.4s ease;
@@ -867,42 +868,40 @@ html[data-theme="light"] .admin-data-shell {
 
 .nav-notch-left {
   border-radius: 9999px 0 0 9999px;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%);
 }
 
 .nav-notch-right {
   border-radius: 0 9999px 9999px 0;
-  clip-path: polygon(22px 0, 100% 0, 100% 100%, 0 100%);
+  clip-path: polygon(28px 0, 100% 0, 100% 100%, 0 100%);
 }
 
-/* Gold outline layer (::before) with a dark inset layer (::after) so the angled edges keep a border. */
+/* Solid gold center tab; local vars flip child components (toggle, divider, menu button) to dark ink. */
 .nav-notch-center {
-  --notch: polygon(0 0, 100% 0, 100% 38%, 93% 100%, 7% 100%, 0 38%);
+  --gold: #1a0a0d;
+  --foreground: #1a0a0d;
   position: relative;
-  filter: drop-shadow(0 8px 22px rgba(212, 175, 55, 0.22));
-}
-
-.nav-notch-center::before,
-.nav-notch-center::after {
-  content: '';
-  position: absolute;
-  clip-path: var(--notch);
-  z-index: 0;
+  filter: drop-shadow(0 10px 28px rgba(212, 175, 55, 0.35));
 }
 
 .nav-notch-center::before {
+  content: '';
+  position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(212, 175, 55, 0.85), rgba(212, 175, 55, 0.35));
-}
-
-.nav-notch-center::after {
-  inset: 1px;
-  background: linear-gradient(180deg, #2a0a10, #12080b);
+  z-index: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 90% 100%, 10% 100%, 0 45%);
+  background: linear-gradient(180deg, #e2c25a, #d4af37);
 }
 
 .nav-notch-center > * {
   position: relative;
   z-index: 1;
+}
+
+.nav-notch-center .nav-icon-btn,
+.nav-notch-center button[aria-label*="mode"] {
+  border-color: rgba(26, 10, 13, 0.3);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .nav-icon-btn {

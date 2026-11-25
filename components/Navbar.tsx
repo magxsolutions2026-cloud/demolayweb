@@ -50,12 +50,12 @@ export default function Navbar() {
         initial={{ y: -72, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className={`pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-3 sm:top-4 ${
+        className={`pointer-events-none fixed inset-x-0 top-3 z-50 flex items-start justify-center px-3 sm:top-4 ${
           scrolled ? 'nav-notch-scrolled' : ''
         }`}
       >
         <nav
-          className="nav-notch-side nav-notch-left pointer-events-auto hidden h-12 items-center gap-1 pl-7 pr-9 lg:flex"
+          className="nav-notch-side nav-notch-left pointer-events-auto mt-1.5 hidden h-11 min-w-[22rem] items-center justify-start gap-3 pl-8 pr-10 lg:flex"
           aria-label="Primary"
         >
           {NAV.slice(0, 3).map((item) => (
@@ -65,11 +65,11 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="nav-notch-center pointer-events-auto z-10 flex h-14 items-center gap-3 px-8 lg:-mx-4 lg:px-10">
+        <div className="nav-notch-center pointer-events-auto z-10 flex h-[4.5rem] items-center gap-5 px-10 lg:mx-2 lg:px-12">
           <ThemeToggle />
           <span className="h-5 w-px bg-gold/30" aria-hidden />
           <Link href="/" aria-label="Home" onClick={() => setMobileOpen(false)}>
-            <Logo className="h-9 w-9 shrink-0 transition duration-300 hover:scale-105" priority />
+            <Logo className="h-10 w-10 shrink-0 transition duration-300 hover:scale-105" priority />
           </Link>
           <span className="h-5 w-px bg-gold/30 lg:hidden" aria-hidden />
           <div className="lg:hidden">
@@ -93,7 +93,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        <div className="nav-notch-side nav-notch-right pointer-events-auto hidden h-12 items-center gap-1 pl-9 pr-7 lg:flex">
+        <div className="nav-notch-side nav-notch-right pointer-events-auto mt-1.5 hidden h-11 min-w-[22rem] items-center justify-end gap-3 pl-10 pr-8 lg:flex">
           {NAV.slice(3).map((item) => (
             <NavLink key={item.href} href={item.href} active={isActive(item.href)}>
               {item.label}
@@ -102,7 +102,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={openJoin}
-            className="relative px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-gold transition hover:text-foreground"
+            className="relative px-3 py-2 text-[13px] font-medium tracking-wide text-gold transition hover:text-foreground"
           >
             Join Us
           </button>
@@ -188,7 +188,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`nav-pill relative px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] transition-colors duration-200 ${
+      className={`nav-pill relative px-3 py-2 text-[13px] font-medium tracking-wide transition-colors duration-200 ${
         active ? 'text-gold' : 'text-foreground/85 hover:text-gold'
       }`}
     >
