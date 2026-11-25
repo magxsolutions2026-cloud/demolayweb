@@ -39,7 +39,7 @@ function pinScale(p: number, delay: number, hideJitter: number) {
   return 0;
 }
 
-/** Plain red teardrop map pin with a logo in its head (DeMolay emblem, or the chapter logo at home). */
+/** Red map pin (round head, tapered point) with a white hole holding a logo (DeMolay emblem, or the chapter logo at home). */
 function drawPin(logo: HTMLImageElement | null, home: boolean) {
   const canvas = document.createElement('canvas');
   canvas.width = PIN_CANVAS.w;
@@ -48,32 +48,47 @@ function drawPin(logo: HTMLImageElement | null, home: boolean) {
   if (!ctx) return canvas;
 
   const cx = 128;
-  const cy = 116;
-  const r = 88;
+  const cy = 120;
+  const r = 112;
+  const tipY = PIN_CANVAS.tipY;
+  // The sides leave the head at 55° either side of straight down and curve slightly inward to the point.
+  const sx = r * Math.sin((55 * Math.PI) / 180);
+  const sy = cy + r * Math.cos((55 * Math.PI) / 180);
   ctx.beginPath();
-  ctx.moveTo(cx, PIN_CANVAS.tipY);
-  ctx.bezierCurveTo(cx - 28, 268, cx - r, 208, cx - r, cy);
-  ctx.arc(cx, cy, r, Math.PI, 0);
-  ctx.bezierCurveTo(cx + r, 208, cx + 28, 268, cx, PIN_CANVAS.tipY);
+  ctx.moveTo(cx, tipY);
+  ctx.bezierCurveTo(cx - r * 0.15, tipY - r * 0.5, cx - r * 0.62, sy + r * 0.29, cx - sx, sy);
+  ctx.arc(cx, cy, r, Math.PI / 2 + (55 * Math.PI) / 180, Math.PI / 2 - (55 * Math.PI) / 180);
+  ctx.bezierCurveTo(cx + r * 0.62, sy + r * 0.29, cx + r * 0.15, tipY - r * 0.5, cx, tipY);
   ctx.closePath();
-  const body = ctx.createLinearGradient(0, cy - r, 0, PIN_CANVAS.tipY);
-  body.addColorStop(0, '#d1202b');
-  body.addColorStop(1, '#a20f19');
+  const body = ctx.createLinearGradient(cx - r, 0, cx + r, 0);
+  body.addColorStop(0, '#d92330');
+  body.addColorStop(0.5, '#d92330');
+  body.addColorStop(0.5, '#e52b39');
+  body.addColorStop(1, '#e52b39');
   ctx.fillStyle = body;
+  ctx.fill();
+
+  const hole = r * 0.58;
+  ctx.beginPath();
+  ctx.arc(cx, cy, hole, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
   ctx.fill();
 
   if (logo) {
     ctx.save();
     ctx.beginPath();
-    ctx.arc(cx, cy, home ? r - 6 : r - 10, 0, Math.PI * 2);
+    ctx.arc(cx, cy, hole, 0, Math.PI * 2);
     ctx.clip();
     if (home) {
-      const d = (r - 6) * 2;
+      const d = hole * 2;
       ctx.drawImage(logo, cx - d / 2, cy - d / 2, d, d);
     } else {
-      const h = r * 1.62;
-      const w = (h * logo.naturalWidth) / logo.naturalHeight;
-      ctx.drawImage(logo, cx - w / 2, cy - h / 2 + 4, w, h);
+      // Fit the emblem inside the circle with a little white margin.
+      const box = hole * 1.5;
+      const scale = Math.min(box / logo.naturalWidth, box / logo.naturalHeight);
+      const w = logo.naturalWidth * scale;
+      const h = logo.naturalHeight * scale;
+      ctx.drawImage(logo, cx - w / 2, cy - h / 2, w, h);
     }
     ctx.restore();
   }
