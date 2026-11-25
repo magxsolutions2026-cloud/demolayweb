@@ -1,4 +1,5 @@
 import HomeFeed from '@/components/site/HomeFeed';
+import HeroVideoParallax from '@/components/site/HeroVideoParallax';
 import HomeHeroVideoDynamic from '@/components/site/HomeHeroVideoDynamic';
 import InteractiveHeroHUD from '@/components/site/InteractiveHeroHUD';
 import { NewsletterSubscribeForm } from '@/components/site/NewsletterSubscribeForm';
@@ -51,7 +52,9 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
         className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[100dvh] w-full overflow-hidden"
         aria-hidden
       >
-        <HomeHeroVideoDynamic />
+        <HeroVideoParallax>
+          <HomeHeroVideoDynamic />
+        </HeroVideoParallax>
       </div>
 
       <section id="home" className="relative z-10 min-h-[100dvh] w-full">

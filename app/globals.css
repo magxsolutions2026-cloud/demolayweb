@@ -4,11 +4,11 @@
 .orbit-window-frame {
   border-radius: 9999px;
   padding: clamp(6px, 1vw, 12px);
-  background: linear-gradient(180deg, #4a4446 0%, #1a1719 30%, #0d0b0c 55%, #2b2628 80%, #6b5f4a 100%);
+  background: var(--capsule-metal);
   box-shadow:
     0 30px 60px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(212, 175, 55, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    0 0 0 1px var(--capsule-rim),
+    inset 0 1px 0 var(--capsule-highlight);
 }
 
 .orbit-window {
@@ -56,8 +56,22 @@
   --secondary-color: #d4af37;
 
   --gradient-main: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-  --glass-bg: rgba(18, 18, 18, 0.45);
+  --glass-bg: rgba(9, 11, 22, 0.5);
   --glass-border: rgba(212, 175, 55, 0.3);
+
+  /* Globe capsule colorway: gunmetal body (grey top, black middle, bronze bottom), thin gold rim,
+     white top highlight, deep space-blue glass. Reused by the site frame, cards and buttons. */
+  --capsule-metal: linear-gradient(180deg, #4a4446 0%, #1a1719 30%, #0d0b0c 55%, #2b2628 80%, #6b5f4a 100%);
+  --capsule-metal-short: linear-gradient(180deg, #4a4446 0%, #221e20 38%, #0d0b0c 58%, #2b2628 82%, #6b5f4a 100%);
+  --capsule-rim-line: linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(212, 175, 55, 0.18) 45%, rgba(43, 38, 40, 0.6) 70%, rgba(212, 175, 55, 0.4));
+  --capsule-rim: rgba(212, 175, 55, 0.25);
+  --capsule-highlight: rgba(255, 255, 255, 0.25);
+  --capsule-glass: radial-gradient(ellipse at 50% 0%, rgba(11, 16, 32, 0.7), rgba(2, 3, 8, 0.55) 70%);
+  /* Buttons: the capsule's gunmetal with a faint brushed-metal grain; lighter metal for the hover sweep. */
+  --capsule-brushed: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px);
+  --capsule-button: var(--capsule-brushed), var(--capsule-metal-short);
+  --capsule-button-hover: var(--capsule-brushed), linear-gradient(180deg, #5d5659 0%, #2e2a2c 40%, #1a1719 60%, #3a3436 82%, #7d6f58 100%);
+  --capsule-text: #f5f5f5;
 }
 
 html[data-theme="light"] {
@@ -143,25 +157,16 @@ html[data-theme="light"] .input:focus {
   background: #fff;
 }
 
-html[data-theme="light"] .cta-ghost {
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(115, 14, 27, 0.35);
-}
-
-html[data-theme="light"] .cta-ghost:hover {
-  color: #fff7db;
-}
-
 .glass {
   position: relative;
-  background: var(--glass-bg);
+  background: var(--capsule-glass), var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid transparent;
   box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.4),
-    0 0 18px rgba(115, 14, 27, 0.25),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--capsule-rim),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   overflow: hidden;
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -176,11 +181,11 @@ html[data-theme="light"] .cta-ghost:hover {
 
 .glass.glass-card-lift:hover {
   transform: translateY(-6px);
-  border-color: rgba(212, 175, 55, 0.48);
   box-shadow:
-    0 24px 56px rgba(0, 0, 0, 0.45),
-    0 0 28px rgba(115, 14, 27, 0.32),
-    0 0 36px rgba(212, 175, 55, 0.14);
+    0 24px 56px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(212, 175, 55, 0.45),
+    0 0 36px rgba(212, 175, 55, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 html[data-theme="light"] .glass.glass-card-lift:hover {
@@ -208,6 +213,28 @@ html[data-theme="light"] .glass.glass-card-lift:hover {
   inset: 0;
   background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.1), transparent 55%);
   pointer-events: none;
+}
+
+/* Capsule rim: gunmetal-to-bronze 1px ring just inside the card edge (cards clip overflow). */
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--capsule-rim-line);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+html[data-theme="light"] .glass {
+  background: var(--glass-bg);
+}
+
+html[data-theme="light"] .glass::after {
+  opacity: 0.55;
 }
 
 .hero-depth {
@@ -313,57 +340,69 @@ html[data-theme="light"] .glass.glass-card-lift:hover {
   background: rgba(20, 20, 20, 0.95);
 }
 
+/* Buttons echo the site frame: chamfered corners and a shallow notch like the frame's top notch.
+   The element's own background is the 1px rim; ::after is the metal fill inset by 1px, both clipped to
+   --btn-shape. Shape A (notch on top) is the primary; shape B (notch on the bottom) mirrors it. */
+.capsule-btn,
+.cta-primary,
+.cta-ghost {
+  --btn-shape: polygon(12px 0, 28% 0, calc(28% + 4px) 4px, calc(72% - 4px) 4px, 72% 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 3px 100%, 0 calc(100% - 3px), 0 12px);
+  --btn-rim: rgba(212, 175, 55, 0.5);
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  background: var(--btn-rim);
+  clip-path: var(--btn-shape);
+  color: var(--capsule-text);
+  transition: transform 0.3s ease-in-out, color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.capsule-btn::after,
+.cta-primary::after,
+.cta-ghost::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  clip-path: var(--btn-shape);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px), var(--capsule-button);
+  transition: filter 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.capsule-btn-b,
+.cta-ghost {
+  --btn-shape: polygon(3px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 72% 100%, calc(72% - 4px) calc(100% - 4px), calc(28% + 4px) calc(100% - 4px), 28% 100%, 12px 100%, 0 calc(100% - 12px), 0 3px);
+  --btn-rim: rgba(212, 175, 55, 0.28);
+  color: rgba(245, 245, 245, 0.8);
+}
+
+.capsule-btn:hover,
+.cta-primary:hover,
+.cta-ghost:hover {
+  --btn-rim: rgba(212, 175, 55, 0.7);
+  color: var(--capsule-text);
+}
+
+.capsule-btn:hover::after,
+.cta-primary:hover::after,
+.cta-ghost:hover::after {
+  filter: brightness(1.35);
+}
+
 .cta-primary,
 .cta-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
   padding: 0.8rem 1.6rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  transition: all 0.3s ease-in-out;
-}
-
-.cta-primary {
-  position: relative;
-  overflow: hidden;
-  color: #0a0a0a;
-  border: 1px solid rgba(212, 175, 55, 0.45);
-  background: linear-gradient(120deg, #d4af37 0%, #9f6f28 38%, #730e1b 100%);
-  box-shadow: 0 10px 28px rgba(115, 14, 27, 0.3);
 }
 
 .cta-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(115, 14, 27, 0.45), 0 0 20px rgba(212, 175, 55, 0.2);
-}
-
-.cta-ghost {
-  position: relative;
-  color: var(--gold);
-  border: 1px solid rgba(212, 175, 55, 0.75);
-  background: rgba(10, 10, 10, 0.25);
-}
-
-.cta-ghost::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  width: 0;
-  border-radius: inherit;
-  background: linear-gradient(120deg, rgba(212, 175, 55, 0.95), rgba(115, 14, 27, 0.95));
-  transition: width 0.3s ease-in-out;
-  z-index: -1;
-}
-
-.cta-ghost:hover {
-  color: #fff7db;
-  border-color: transparent;
-}
-
-.cta-ghost:hover::before {
-  width: 100%;
 }
 
 @keyframes shine {
@@ -528,6 +567,17 @@ html[data-theme="light"] .fire-canvas {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
   border-radius: 4px;
+}
+
+/* Public site (class set by SiteFrame): hide the page scrollbar but keep scrolling. */
+html.site-no-scrollbar,
+html.site-no-scrollbar body {
+  scrollbar-width: none;
+}
+
+html.site-no-scrollbar::-webkit-scrollbar,
+html.site-no-scrollbar body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Hide scrollbar but keep scroll (carousel) */
@@ -709,54 +759,57 @@ html[data-theme="light"] .admin-data-shell {
   font-weight: 700;
   letter-spacing: 0.02em;
   transition: all 0.3s ease-in-out;
-  color: #0a0a0a;
+  color: var(--capsule-text);
   border: 1px solid rgba(212, 175, 55, 0.45);
-  background: linear-gradient(120deg, #d4af37 0%, #9f6f28 38%, #730e1b 100%);
-  box-shadow: 0 10px 28px rgba(115, 14, 27, 0.3);
+  background: var(--capsule-button);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(212, 175, 55, 0.2);
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(115, 14, 27, 0.45), 0 0 20px rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.65);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55), 0 0 18px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(212, 175, 55, 0.25);
 }
 
-/* —— Public site: premium nav + Join Us modal —— */
-/* Reference-matched nav: frosted glass wings (clip-path) beside an SVG gold center tab (NavShape). */
-.nav-ref-shape {
-  filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.45));
-  transition: filter 0.4s ease;
+/* Capsule-metal pill/shell (chatbot launcher and other floating chrome). */
+.capsule-shell {
+  background: var(--capsule-button);
+  border: 1px solid var(--capsule-rim);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 var(--capsule-highlight);
 }
 
-.nav-ref-scrolled .nav-ref-shape {
-  filter: drop-shadow(0 14px 34px rgba(0, 0, 0, 0.7));
+/* —— Public site: framed nav + Join Us modal —— */
+/* Bezel geometry, shared by SiteFrame (SVG) and the Navbar title that sits in the top notch. */
+:root {
+  --frame-inset: 8px;
+  --frame-radius: 18px;
+  --frame-notch-top: 84px;
+  --frame-notch-bottom: 64px;
+  --frame-notch-depth: 40px;
 }
 
-.nav-wing {
-  --wing-fill: linear-gradient(var(--wing-dir), rgba(156, 58, 78, 0.42), rgba(94, 26, 40, 0.3) 60%, rgba(46, 11, 18, 0.45));
-  background: var(--wing-fill);
-  /* Blur comes from Tailwind backdrop-* classes in Navbar.tsx: the CSS build rewrites a literal
-     backdrop-filter here to -webkit- only, which current Chrome ignores. */
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(212, 175, 55, 0.14);
-  transition: background 0.4s ease;
+@media (min-width: 1024px) {
+  :root {
+    --frame-inset: 14px;
+    --frame-radius: 26px;
+    --frame-notch-top: 136px;
+    --frame-notch-bottom: 104px;
+    --frame-notch-depth: 48px;
+  }
 }
 
-.nav-ref-scrolled .nav-wing {
-  background: linear-gradient(var(--wing-dir), rgba(156, 58, 78, 0.68), rgba(94, 26, 40, 0.6) 60%, rgba(46, 11, 18, 0.72));
+/* Dark band under the nav row so links stay readable over any page; deepens once scrolled. */
+.site-frame-band {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 116px;
+  background: linear-gradient(to bottom, rgba(10, 9, 9, 0.7), rgba(10, 9, 9, 0.35) 60%, transparent);
+  opacity: 0.6;
+  transition: opacity 0.4s ease;
 }
 
-/* Tapered outer end (with small rounding points); the inner end hides under the center socket. */
-.nav-wing-left {
-  --wing-dir: 90deg;
-  clip-path: polygon(6px 0, calc(100% - 36px) 0, 100% 100%, 20px 100%, 14px 94%, 1px 9%, 2px 2%);
-}
-
-.nav-wing-right {
-  --wing-dir: 270deg;
-  clip-path: polygon(36px 0, calc(100% - 6px) 0, calc(100% - 2px) 2%, calc(100% - 1px) 9%, calc(100% - 14px) 94%, calc(100% - 20px) 100%, 0 100%);
-}
-
-html[data-theme="light"] .nav-wing {
-  background: linear-gradient(var(--wing-dir), rgba(156, 58, 78, 0.85), rgba(94, 26, 40, 0.8) 60%, rgba(46, 11, 18, 0.88));
+.site-frame-band-scrolled {
+  opacity: 1;
 }
 
 .join-modal-surface {

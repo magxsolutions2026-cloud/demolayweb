@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import HeroScrollIndicator from '@/components/HeroScrollIndicator';
 import { useJoinUsModal } from './JoinUsModalContext';
 
@@ -10,8 +10,6 @@ export default function InteractiveHeroHUD() {
   const { open: openJoinModal } = useJoinUsModal();
   const prefersReducedMotion = useReducedMotion();
 
-  // Mouse tilt tracking
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [btnMagnet, setBtnMagnet] = useState({ x: 0, y: 0 });
 
   // Magnetic button logic
@@ -29,18 +27,6 @@ export default function InteractiveHeroHUD() {
     setBtnMagnet({ x: 0, y: 0 });
   };
 
-  // Parallax mouse tracker for the viewport HUD
-  const handleHeroMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      if (prefersReducedMotion) return;
-      const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5) * 2; // -1 to 1
-      const y = (e.clientY / innerHeight - 0.5) * 2;
-      setMouseOffset({ x, y });
-    },
-    [prefersReducedMotion]
-  );
-
   const scrollToFeed = () => {
     const el = document.getElementById('feed');
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -48,7 +34,6 @@ export default function InteractiveHeroHUD() {
 
   return (
     <div
-      onMouseMove={handleHeroMouseMove}
       className="relative flex min-h-[100dvh] w-full flex-col justify-between overflow-hidden px-4 pb-16 pt-20 sm:px-8 sm:pb-20 sm:pt-24 lg:px-12 lg:pb-24 lg:pt-28 xl:px-16"
     >
       {/* ======================================================== */}
@@ -72,14 +57,7 @@ export default function InteractiveHeroHUD() {
       {/* 2. PERIMETER EDITORIAL TYPOGRAPHY & MAGNETIC CTA (BOTTOM-LEFT) */}
       {/* ======================================================== */}
       <div className="relative z-20 hidden flex-col items-start justify-end gap-8 md:flex">
-        <motion.div
-          animate={{
-            x: mouseOffset.x * 10,
-            y: mouseOffset.y * 10,
-          }}
-          transition={{ type: 'spring', stiffness: 100, damping: 18 }}
-          className="max-w-xl text-left"
-        >
+        <div className="max-w-xl text-left">
           {/* Eyebrow Label */}
           <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-black/35 px-3 py-1 backdrop-blur-xl">
             <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#d4af37]" />
@@ -109,7 +87,7 @@ export default function InteractiveHeroHUD() {
               onMouseLeave={handleBtnMouseLeave}
               animate={{ x: btnMagnet.x, y: btnMagnet.y }}
               transition={{ type: 'spring', stiffness: 220, damping: 16 }}
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-gold/50 bg-[linear-gradient(135deg,#d4af37_0%,#a8742a_45%,#730e1b_100%)] px-6 py-3 text-xs font-bold uppercase tracking-[0.22em] text-[#0b090d] shadow-[0_12px_32px_rgba(212,175,55,0.35)] transition duration-300 hover:scale-[1.03] hover:shadow-[0_16px_42px_rgba(212,175,55,0.5)] sm:text-sm"
+              className="capsule-btn group inline-flex items-center gap-2 overflow-hidden px-6 py-3 text-xs font-bold uppercase tracking-[0.22em] duration-300 hover:scale-[1.03] sm:text-sm"
             >
               <span className="relative z-10">Petition for Entry</span>
               <ArrowUpRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -120,12 +98,12 @@ export default function InteractiveHeroHUD() {
             <button
               type="button"
               onClick={scrollToFeed}
-              className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-black/35 px-5 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-gold/90 backdrop-blur-xl transition hover:border-gold/60 hover:bg-black/55 hover:text-white sm:text-sm"
+              className="capsule-btn capsule-btn-b inline-flex items-center gap-2 px-5 py-3 text-xs font-semibold uppercase tracking-[0.2em] sm:text-sm"
             >
               <span>Explore Chapter</span>
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* ======================================================== */}
