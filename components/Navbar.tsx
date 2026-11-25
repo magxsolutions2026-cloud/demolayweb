@@ -50,69 +50,64 @@ export default function Navbar() {
         initial={{ y: -72, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className={`site-nav fixed top-0 z-50 w-full transition-all duration-500 ${
-          scrolled
-            ? 'site-nav-scrolled shadow-[0_12px_40px_rgba(0,0,0,0.45)] py-1'
-            : 'py-2'
+        className={`pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-3 sm:top-4 ${
+          scrolled ? 'nav-notch-scrolled' : ''
         }`}
-        style={{
-          backdropFilter: scrolled ? 'blur(24px)' : 'blur(14px)',
-          backgroundColor: scrolled ? 'rgba(12, 10, 16, 0.96)' : 'transparent',
-        }}
       >
-        <div className="flex h-16 w-full items-center justify-between gap-4 px-4 sm:px-8 lg:px-12 xl:px-16">
-          <Link href="/" className="group flex min-w-0 items-center gap-3" onClick={() => setMobileOpen(false)}>
-            <Logo className="h-9 w-9 shrink-0 transition duration-300 group-hover:scale-105" priority />
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold sm:text-xs">T. De Leon Chapter</p>
-              <p className="truncate text-sm font-bold tracking-tight text-foreground sm:text-base">Order of DeMolay</p>
-            </div>
+        <nav
+          className="nav-notch-side nav-notch-left pointer-events-auto hidden h-12 items-center gap-1 pl-7 pr-9 lg:flex"
+          aria-label="Primary"
+        >
+          {NAV.slice(0, 3).map((item) => (
+            <NavLink key={item.href} href={item.href} active={isActive(item.href)}>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="nav-notch-center pointer-events-auto z-10 flex h-14 items-center gap-3 px-8 lg:-mx-4 lg:px-10">
+          <ThemeToggle />
+          <span className="h-5 w-px bg-gold/30" aria-hidden />
+          <Link href="/" aria-label="Home" onClick={() => setMobileOpen(false)}>
+            <Logo className="h-9 w-9 shrink-0 transition duration-300 hover:scale-105" priority />
           </Link>
-
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
-            {NAV.map((item) => (
-              <NavLink key={item.href} href={item.href} active={isActive(item.href)}>
-                {item.label}
-              </NavLink>
-            ))}
-            <button
-              type="button"
-              onClick={openJoin}
-              className="relative px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-foreground/90 transition hover:text-gold"
-            >
-              Join Us
-            </button>
-            <div className="ml-2 flex items-center gap-2 border-l border-white/10 pl-4">
-              <ThemeToggle />
-              <AdminModal />
-            </div>
-          </nav>
-
-          <div className="flex items-center gap-2 lg:hidden">
-            <ThemeToggle />
+          <span className="h-5 w-px bg-gold/30 lg:hidden" aria-hidden />
+          <div className="lg:hidden">
             <AdminModal />
-            <button
-              type="button"
-              className="nav-icon-btn rounded-xl p-2 text-foreground"
-              aria-expanded={mobileOpen}
-              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-              onClick={() => setMobileOpen((o) => !o)}
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {mobileOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
           </div>
+          <span className="h-5 w-px bg-gold/30" aria-hidden />
+          <button
+            type="button"
+            className="nav-icon-btn rounded-xl p-1.5 text-foreground"
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setMobileOpen((o) => !o)}
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
 
-        <div
-          className="pointer-events-none absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-gold/50 to-transparent opacity-80"
-          aria-hidden
-        />
+        <div className="nav-notch-side nav-notch-right pointer-events-auto hidden h-12 items-center gap-1 pl-9 pr-7 lg:flex">
+          {NAV.slice(3).map((item) => (
+            <NavLink key={item.href} href={item.href} active={isActive(item.href)}>
+              {item.label}
+            </NavLink>
+          ))}
+          <button
+            type="button"
+            onClick={openJoin}
+            className="relative px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-gold transition hover:text-foreground"
+          >
+            Join Us
+          </button>
+          <AdminModal />
+        </div>
       </motion.header>
 
       <AnimatePresence>

@@ -844,26 +844,65 @@ html[data-theme="light"] .admin-data-shell {
 }
 
 /* —— Public site: premium nav + Join Us modal —— */
-.site-nav {
-  background:
-    linear-gradient(105deg, rgba(115, 14, 27, 0.28) 0%, rgba(12, 10, 16, 0.92) 45%, rgba(12, 10, 16, 0.94) 100%),
-    repeating-linear-gradient(
-      135deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 255, 255, 0.03) 2px,
-      rgba(255, 255, 255, 0.03) 3px
-    ),
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.14);
+/* Split "notched" nav: two glass side pills + a raised center tab. Colors stay dark in both themes. */
+.nav-notch-side,
+.nav-notch-center {
+  --foreground: #f5f5f5;
+  --background: #0a0a0a;
 }
 
-.site-nav-scrolled {
-  background: rgba(12, 10, 16, 0.96);
+.nav-notch-side {
+  background: linear-gradient(180deg, rgba(115, 14, 27, 0.42), rgba(60, 8, 16, 0.55));
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.nav-notch-scrolled .nav-notch-side {
+  background: linear-gradient(180deg, rgba(115, 14, 27, 0.7), rgba(40, 6, 12, 0.85));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.nav-notch-left {
+  border-radius: 9999px 0 0 9999px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%);
+}
+
+.nav-notch-right {
+  border-radius: 0 9999px 9999px 0;
+  clip-path: polygon(22px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Gold outline layer (::before) with a dark inset layer (::after) so the angled edges keep a border. */
+.nav-notch-center {
+  --notch: polygon(0 0, 100% 0, 100% 38%, 93% 100%, 7% 100%, 0 38%);
+  position: relative;
+  filter: drop-shadow(0 8px 22px rgba(212, 175, 55, 0.22));
+}
+
+.nav-notch-center::before,
+.nav-notch-center::after {
+  content: '';
+  position: absolute;
+  clip-path: var(--notch);
+  z-index: 0;
+}
+
+.nav-notch-center::before {
+  inset: 0;
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.85), rgba(212, 175, 55, 0.35));
+}
+
+.nav-notch-center::after {
+  inset: 1px;
+  background: linear-gradient(180deg, #2a0a10, #12080b);
+}
+
+.nav-notch-center > * {
+  position: relative;
+  z-index: 1;
 }
 
 .nav-icon-btn {
@@ -887,19 +926,6 @@ html[data-theme="light"] .admin-data-shell {
   background: radial-gradient(ellipse 90% 55% at 50% -25%, rgba(212, 175, 55, 0.12), transparent 55%);
 }
 
-html[data-theme="light"] .site-nav {
-  background:
-    linear-gradient(105deg, rgba(115, 14, 27, 0.1) 0%, rgba(255, 252, 246, 0.94) 42%, rgba(255, 252, 246, 0.96) 100%),
-    repeating-linear-gradient(
-      135deg,
-      transparent,
-      transparent 2px,
-      rgba(115, 14, 27, 0.06) 2px,
-      rgba(115, 14, 27, 0.06) 3px
-    );
-  border-bottom-color: rgba(115, 14, 27, 0.12);
-}
-
-html[data-theme="light"] .site-nav-scrolled {
-  background: rgba(255, 252, 246, 0.97);
+html[data-theme="light"] .nav-notch-side {
+  background: linear-gradient(180deg, rgba(115, 14, 27, 0.82), rgba(90, 10, 22, 0.9));
 }
