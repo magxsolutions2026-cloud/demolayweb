@@ -97,7 +97,7 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
 
           {/* Philippine DeMolay: a 3D Earth over the Philippines, seen through a capsule cabin window */}
           <div className="mx-auto mt-8 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] md:mt-12">
-            <section className="orbit-cabin px-5 pb-5 pt-10 md:px-10 md:pt-14" aria-labelledby="worldwide-heading">
+            <section className="relative pt-10 md:pt-14" aria-labelledby="worldwide-heading">
               <div className="relative z-10 text-center">
                 <p className="inline-flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.24em] text-foreground/60 md:text-xs">
                   <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#d4af37]" />
@@ -109,7 +109,7 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
                 <p className="font-serif text-2xl leading-tight text-foreground/50 md:text-4xl">seen from orbit.</p>
               </div>
 
-              <div className="orbit-window-frame relative z-10 mx-auto mt-8 w-full max-w-5xl md:mt-12">
+              <div className="orbit-window-frame relative z-10 mt-8 w-full md:mt-12">
                 <div
                   className="orbit-window"
                   role="img"
@@ -143,7 +143,7 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
                 </div>
               </div>
 
-              <div className="relative z-10 mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-foreground/45">
+              <div className="relative z-10 mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-foreground/10 pt-4 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-foreground/45">
                 <span>T. De Leon Chapter No. 47</span>
                 <span className="flex flex-wrap gap-6">
                   <span>
