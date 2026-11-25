@@ -1,4 +1,3 @@
-import HeroVideoParallax from '@/components/site/HeroVideoParallax';
 import HomeHeroVideoDynamic from '@/components/site/HomeHeroVideoDynamic';
 import InteractiveHeroHUD from '@/components/site/InteractiveHeroHUD';
 import HomeConnect from '@/components/site/home/HomeConnect';
@@ -19,15 +18,13 @@ export default function HomePageSections({ data }: { data: HomeData }) {
   return (
     <main className="page-enter relative">
       <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[100dvh] w-full overflow-hidden" aria-hidden>
-        <HeroVideoParallax>
-          <HomeHeroVideoDynamic />
-        </HeroVideoParallax>
+        <HomeHeroVideoDynamic />
       </div>
       <section id="home" className="relative z-10 min-h-[100dvh] w-full">
         <InteractiveHeroHUD />
       </section>
 
-      <div className="home-body relative z-10 w-full">
+      <div className="relative z-10 w-full">
         <HomeStatStrip />
         <HomeIntro />
         <HomeVirtues />

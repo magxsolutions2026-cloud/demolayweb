@@ -809,11 +809,6 @@ html[data-theme="light"] .admin-data-shell {
   }
 }
 
-/* Everything below the hero sits on a solid backdrop that fades in over the video. */
-.home-body {
-  background: linear-gradient(to bottom, transparent, var(--background) 45vh);
-}
-
 /* Seven Cardinal Virtues: numbered capsule-metal plates. */
 .virtue-plate {
   position: relative;
