@@ -411,9 +411,11 @@ export default function HomeHeroVideoBackground() {
       aria-hidden
     >
       <div className="absolute inset-0 bg-black" />
-      {/* Poster under the videos: visible at once, covered as soon as a video paints. */}
-      {/* eslint-disable-next-line @next/next/no-img-element -- static public file, must match the video framing */}
-      <img src={HERO_POSTER_SRC} alt="" className={HERO_VIDEO_CLASS_NAME} fetchPriority="high" />
+      {/* Poster only until the idle video can play; after that the layers behave exactly as before. */}
+      {!idleReady ? (
+        // eslint-disable-next-line @next/next/no-img-element -- static public file, must match the video framing
+        <img src={HERO_POSTER_SRC} alt="" className={HERO_VIDEO_CLASS_NAME} fetchPriority="high" />
+      ) : null}
 
       <video
         ref={idleRef}
@@ -451,7 +453,7 @@ export default function HomeHeroVideoBackground() {
         ref={forwardRef}
         muted
         playsInline
-        preload={idleReady || idleError ? 'auto' : 'metadata'}
+        preload="auto"
         disablePictureInPicture
         disableRemotePlayback
         tabIndex={-1}
@@ -481,7 +483,7 @@ export default function HomeHeroVideoBackground() {
         ref={reverseRef}
         muted
         playsInline
-        preload={idleReady || idleError ? 'auto' : 'metadata'}
+        preload="auto"
         disablePictureInPicture
         disableRemotePlayback
         tabIndex={-1}

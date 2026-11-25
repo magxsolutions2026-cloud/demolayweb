@@ -443,16 +443,15 @@ html[data-theme="light"] .glass::after {
 @keyframes pageEnter {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
+/* Quick fade on each page change (opacity only: a transform would detach the hero's fixed video). */
 .page-enter {
-  animation: pageEnter 0.55s ease-out;
+  animation: pageEnter 0.25s ease-out;
 }
 
 /**

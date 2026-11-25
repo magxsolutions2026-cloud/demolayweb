@@ -16,7 +16,7 @@ import type { HomeData } from '@/lib/homeData';
  */
 export default function HomePageSections({ data }: { data: HomeData }) {
   return (
-    <main className="page-enter relative">
+    <main className="relative">
       <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[100dvh] w-full overflow-hidden" aria-hidden>
         <HomeHeroVideoDynamic />
       </div>
