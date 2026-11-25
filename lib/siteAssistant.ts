@@ -250,6 +250,13 @@ function dedupePrompts(prompts: string[]): string[] {
   });
 }
 
+/** The guide's public knowledge as plain text, used to ground the AI replies (see lib/siteAssistantAi.ts). */
+export function siteAssistantKnowledgeText(): string {
+  return KNOWLEDGE_ENTRIES.map((entry) =>
+    [`## ${entry.title}`, ...entry.paragraphs, ...(entry.bullets || []).map((bullet) => `- ${bullet}`)].join('\n'),
+  ).join('\n\n');
+}
+
 export function createWelcomeReply(): SiteAssistantReply {
   return WELCOME_REPLY;
 }

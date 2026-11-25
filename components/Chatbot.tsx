@@ -18,7 +18,21 @@ type ChatMessage =
   | { id: string; role: 'assistant'; reply: SiteAssistantReply }
   | { id: string; role: 'user'; text: string };
 
-const THINKING_DELAY_MS = 280;
+/** Turns sent to the AI route for context (the route caps this too). */
+const HISTORY_TURNS = 8;
+
+/** AI text shown in the usual bubble, with the built-in answer's quick actions and follow-up prompts. */
+function aiReply(text: string, local: SiteAssistantReply): SiteAssistantReply {
+  return {
+    title: 'Sir Knight',
+    paragraphs: text
+      .split(/\n+/)
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean),
+    actions: local.actions,
+    suggestedPrompts: local.suggestedPrompts,
+  };
+}
 
 function createWelcomeMessage(id = 'assistant-welcome'): ChatMessage {
   return { id, role: 'assistant', reply: createWelcomeReply() };
@@ -36,7 +50,7 @@ export default function Chatbot() {
   const [isThinking, setIsThinking] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([createWelcomeMessage()]);
   const nextIdRef = useRef(0);
-  const thinkingTimerRef = useRef<number | null>(null);
+  const requestRef = useRef<AbortController | null>(null);
   const scrollAnchorRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -54,11 +68,7 @@ export default function Chatbot() {
   );
 
   useEffect(() => {
-    return () => {
-      if (thinkingTimerRef.current) {
-        clearTimeout(thinkingTimerRef.current);
-      }
-    };
+    return () => requestRef.current?.abort();
   }, []);
 
   useEffect(() => {
@@ -149,10 +159,8 @@ export default function Chatbot() {
   };
 
   const resetConversation = () => {
-    if (thinkingTimerRef.current) {
-      clearTimeout(thinkingTimerRef.current);
-      thinkingTimerRef.current = null;
-    }
+    requestRef.current?.abort();
+    requestRef.current = null;
     setIsThinking(false);
     setInput('');
     setMessages([createWelcomeMessage(nextMessageId('assistant'))]);
@@ -174,28 +182,79 @@ export default function Chatbot() {
     window.open(action.href, '_blank', 'noopener,noreferrer');
   };
 
+  /**
+   * Streams Sir Knight's AI reply from /api/assistant. Without AI (no key, rate limit, error) it falls back
+   * to the built-in keyword answers; a reply already partly shown is kept as is.
+   */
+  const askAssistant = async (question: string, history: { role: 'user' | 'assistant'; content: string }[]) => {
+    const local = resolveSiteAssistantReply(question);
+    const id = nextMessageId('assistant');
+    const controller = new AbortController();
+    requestRef.current = controller;
+    let started = false;
+
+    try {
+      const response = await fetch('/api/assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history }),
+        signal: controller.signal,
+      });
+      if (!response.ok || !response.body) throw new Error('Assistant unavailable');
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let text = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        text += decoder.decode(value, { stream: true });
+        if (!text.trim()) continue;
+        const reply = aiReply(text, local);
+        if (!started) {
+          started = true;
+          setIsThinking(false);
+          setMessages((current) => [...current, { id, role: 'assistant', reply }]);
+        } else {
+          setMessages((current) => current.map((message) => (message.id === id ? { ...message, reply } : message)));
+        }
+      }
+      if (!started) throw new Error('Empty reply');
+    } catch {
+      if (controller.signal.aborted || started) return;
+      startTransition(() => {
+        setMessages((current) => [...current, { id, role: 'assistant', reply: local }]);
+      });
+    } finally {
+      if (requestRef.current === controller) {
+        requestRef.current = null;
+        setIsThinking(false);
+      }
+    }
+  };
+
   const submitPrompt = (prompt: string) => {
     const question = prompt.trim();
     if (!question || isThinking) return;
 
-    if (thinkingTimerRef.current) {
-      clearTimeout(thinkingTimerRef.current);
-    }
+    const welcome = createWelcomeReply();
+    const history = [
+      ...messages
+        .filter((message) => message.role === 'user' || message.reply !== welcome)
+        .map((message) =>
+          message.role === 'user'
+            ? { role: 'user' as const, content: message.text }
+            : { role: 'assistant' as const, content: message.reply.paragraphs.join('\n\n') },
+        ),
+      { role: 'user' as const, content: question },
+    ].slice(-HISTORY_TURNS);
 
     setInput('');
     startTransition(() => {
       setMessages((current) => [...current, { id: nextMessageId('user'), role: 'user', text: question }]);
     });
     setIsThinking(true);
-
-    thinkingTimerRef.current = window.setTimeout(() => {
-      const reply = resolveSiteAssistantReply(question);
-      startTransition(() => {
-        setMessages((current) => [...current, { id: nextMessageId('assistant'), role: 'assistant', reply }]);
-      });
-      setIsThinking(false);
-      thinkingTimerRef.current = null;
-    }, THINKING_DELAY_MS);
+    void askAssistant(question, history);
   };
 
   return (
@@ -213,7 +272,7 @@ export default function Chatbot() {
           aria-expanded={isOpen}
           aria-label={isOpen ? 'Close chapter guide' : 'Open chapter guide'}
           transition={launcherTransition}
-          className="group flex items-center rounded-full border border-gold/25 bg-[linear-gradient(145deg,rgba(18,14,24,0.96),rgba(10,8,14,0.98))] px-3 py-3 pr-3 shadow-[0_24px_60px_rgba(0,0,0,0.38)] backdrop-blur-2xl transition hover:-translate-y-0.5 hover:border-gold/45"
+          className="group flex items-center capsule-shell rounded-[var(--frame-radius)] px-3 py-3 pr-3 transition hover:-translate-y-0.5 hover:border-gold/45"
         >
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-[linear-gradient(135deg,rgba(212,175,55,0.18),rgba(115,14,27,0.32))] shadow-[0_0_22px_rgba(212,175,55,0.16)]">
             <span className="absolute inset-1 rounded-full border border-white/10" aria-hidden />
@@ -400,8 +459,8 @@ function AssistantBubble({
         </div>
 
         <div className="space-y-3 text-sm leading-relaxed text-foreground/82">
-          {reply.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
+          {reply.paragraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
           ))}
 
           {reply.bullets?.length ? (
