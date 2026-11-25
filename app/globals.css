@@ -1,172 +1,134 @@
 @import "tailwindcss";
 
-@keyframes earthRotate {
+/* Worldwide section: Earth's horizon through a capsule cabin window (HomePageSections.tsx). */
+@keyframes horizonDrift {
   from {
-    background-position: -19px center, -19px center;
+    transform: translateX(0);
   }
   to {
-    background-position: 631px center, 631px center;
+    /* Two map tiles (each 22.5% of the strip), so the loop is seamless. */
+    transform: translateX(-45%);
   }
 }
 
-@keyframes twinkling {
-  0%,
-  100% {
-    opacity: 0.1;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.section-banner {
-  height: 250px;
-  width: 250px;
+/* The cabin stays dark in both themes, so text tokens are pinned to their dark-theme values. */
+.orbit-cabin {
+  --foreground: #f5f5f5;
+  --background: #0a0a0a;
   position: relative;
   overflow: hidden;
-  background-color: #030817;
-  background-image: url("/images/demolay-map-pins.png"), url("/images/earth-surface.jpg");
-  background-size: 260% 130%, 260% 130%;
-  background-repeat: repeat-x, repeat-x;
-  background-position: -19px center, -19px center;
-  border-radius: 50%;
-  border: 1px solid rgba(195, 244, 255, 0.3);
-  box-shadow: 0 0 22px rgba(195, 244, 255, 0.2), inset 0 0 18px rgba(0, 0, 0, 0.65);
-  animation: earthRotate 48s linear infinite;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.14);
+  background:
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(255, 255, 255, 0.05), transparent 65%),
+    linear-gradient(180deg, #121014 0%, #0a090b 50%, #0e0c0f 100%);
 }
 
-.section-banner::after {
+/* Curved ceiling rim above the window. */
+.orbit-cabin::before {
+  content: "";
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  top: -72%;
+  height: 100%;
+  border-radius: 50%;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.orbit-window-frame {
+  border-radius: 9999px;
+  padding: clamp(6px, 1vw, 12px);
+  background: linear-gradient(180deg, #4a4446 0%, #1a1719 30%, #0d0b0c 55%, #2b2628 80%, #6b5f4a 100%);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(212, 175, 55, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.orbit-window {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 2.2 / 1;
+  border-radius: 9999px;
+  background:
+    radial-gradient(1px 1px at 12% 22%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 28% 12%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 46% 26%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 63% 9%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 81% 20%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 91% 34%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(ellipse at 50% 0%, #0b1020, #020308 70%);
+}
+
+@media (min-width: 768px) {
+  .orbit-window {
+    aspect-ratio: 4 / 1;
+  }
+}
+
+/* Glass reflection and inner vignette, above the planet. */
+.orbit-window::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background:
-    radial-gradient(ellipse at 30% 24%, rgba(255, 255, 255, 0.16), transparent 42%),
-    radial-gradient(ellipse at center, transparent 48%, rgba(0, 0, 8, 0.62) 100%);
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.08), transparent 32%);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.16),
+    inset 0 12px 34px rgba(0, 0, 0, 0.85);
   pointer-events: none;
 }
 
-.section-banner:hover {
+.orbit-planet {
+  position: absolute;
+  left: -30%;
+  top: 45%;
+  width: 160%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #06122a;
+  box-shadow:
+    0 -2px 6px rgba(170, 215, 255, 0.85),
+    0 -10px 40px rgba(90, 160, 255, 0.45),
+    0 -30px 90px rgba(60, 120, 255, 0.22);
+}
+
+/* Limb darkening plus a thin lit rim along the horizon. */
+.orbit-planet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle closest-side, transparent 82%, rgba(0, 4, 16, 0.75) 100%);
+  box-shadow: inset 0 3px 8px rgba(190, 225, 255, 0.55);
+  pointer-events: none;
+}
+
+/* Map strip: 2:1 tiles sized so ~60°N sits at the horizon and the equator shows near the window's base. */
+.orbit-planet-surface {
+  position: absolute;
+  left: 0;
+  top: -3.75%;
+  width: 200%;
+  height: 22.5%;
+  background-image: url("/images/demolay-map-pins.png"), url("/images/earth-surface.jpg");
+  background-size: 22.5% 100%, 22.5% 100%;
+  background-repeat: repeat-x, repeat-x;
+  animation: horizonDrift 60s linear infinite;
+}
+
+.orbit-window:hover .orbit-planet-surface {
   animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .section-banner {
+  .orbit-planet-surface {
     animation: none;
   }
-
-  #star-1,
-  #star-2,
-  #star-3,
-  #star-4,
-  #star-5,
-  #star-6,
-  #star-7 {
-    animation: none;
-    opacity: 1;
-  }
-}
-
-.curved-corner-star {
-  display: flex;
-  position: relative;
-}
-
-.curved-corner-bottomleft,
-.curved-corner-bottomright,
-.curved-corner-topleft,
-.curved-corner-topright {
-  width: 4px;
-  height: 5px;
-  overflow: hidden;
-  position: relative;
-}
-
-.curved-corner-bottomleft:before,
-.curved-corner-bottomright:before,
-.curved-corner-topleft:before,
-.curved-corner-topright:before {
-  content: "";
-  display: block;
-  width: 200%;
-  height: 200%;
-  position: absolute;
-  border-radius: 50%;
-}
-
-.curved-corner-bottomleft:before {
-  bottom: 0;
-  left: 0;
-  box-shadow: -5px 5px 0 0 white;
-}
-
-.curved-corner-bottomright:before {
-  bottom: 0;
-  right: 0;
-  box-shadow: 5px 5px 0 0 white;
-}
-
-.curved-corner-topleft:before {
-  top: 0;
-  left: 0;
-  box-shadow: -5px -5px 0 0 white;
-}
-
-.curved-corner-topright:before {
-  top: 0;
-  right: 0;
-  box-shadow: 5px -5px 0 0 white;
-}
-
-#star-1 {
-  position: absolute;
-  left: -20px;
-  animation: twinkling 3s infinite;
-  z-index: 1;
-}
-
-#star-2 {
-  position: absolute;
-  left: -40px;
-  top: 30px;
-  animation: twinkling 2s infinite;
-  z-index: 1;
-}
-#star-3 {
-  position: absolute;
-  left: 350px;
-  top: 90px;
-  animation: twinkling 4s infinite;
-  z-index: 1;
-}
-#star-4 {
-  position: absolute;
-  left: 200px;
-  top: 290px;
-  animation: twinkling 3s infinite;
-  z-index: 1;
-}
-#star-5 {
-  position: absolute;
-  left: 50px;
-  top: 270px;
-  animation: twinkling 1.5s infinite;
-  z-index: 1;
-}
-
-#star-6 {
-  position: absolute;
-  left: 250px;
-  top: -50px;
-  animation: twinkling 4s infinite;
-  z-index: 1;
-}
-#star-7 {
-  position: absolute;
-  left: 290px;
-  top: 60px;
-  animation: twinkling 2s infinite;
-  z-index: 1;
 }
 
 :root {
@@ -844,14 +806,42 @@ html[data-theme="light"] .admin-data-shell {
 }
 
 /* —— Public site: premium nav + Join Us modal —— */
-/* Reference-matched nav: SVG shape (components/Navbar.tsx NavShape) with content laid over it. */
-.nav-ref > svg {
+/* Reference-matched nav: frosted glass wings (clip-path) beside an SVG gold center tab (NavShape). */
+.nav-ref-shape {
   filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.45));
   transition: filter 0.4s ease;
 }
 
-.nav-ref-scrolled > svg {
+.nav-ref-scrolled .nav-ref-shape {
   filter: drop-shadow(0 14px 34px rgba(0, 0, 0, 0.7));
+}
+
+.nav-wing {
+  --wing-fill: linear-gradient(var(--wing-dir), rgba(156, 58, 78, 0.42), rgba(94, 26, 40, 0.3) 60%, rgba(46, 11, 18, 0.45));
+  background: var(--wing-fill);
+  /* Blur comes from Tailwind backdrop-* classes in Navbar.tsx: the CSS build rewrites a literal
+     backdrop-filter here to -webkit- only, which current Chrome ignores. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(212, 175, 55, 0.14);
+  transition: background 0.4s ease;
+}
+
+.nav-ref-scrolled .nav-wing {
+  background: linear-gradient(var(--wing-dir), rgba(156, 58, 78, 0.68), rgba(94, 26, 40, 0.6) 60%, rgba(46, 11, 18, 0.72));
+}
+
+/* Tapered outer end (with small rounding points); the inner end hides under the center socket. */
+.nav-wing-left {
+  --wing-dir: 90deg;
+  clip-path: polygon(6px 0, calc(100% - 36px) 0, 100% 100%, 20px 100%, 14px 94%, 1px 9%, 2px 2%);
+}
+
+.nav-wing-right {
+  --wing-dir: 270deg;
+  clip-path: polygon(36px 0, calc(100% - 6px) 0, calc(100% - 2px) 2%, calc(100% - 1px) 9%, calc(100% - 14px) 94%, calc(100% - 20px) 100%, 0 100%);
+}
+
+html[data-theme="light"] .nav-wing {
+  background: linear-gradient(var(--wing-dir), rgba(156, 58, 78, 0.85), rgba(94, 26, 40, 0.8) 60%, rgba(46, 11, 18, 0.88));
 }
 
 .join-modal-surface {

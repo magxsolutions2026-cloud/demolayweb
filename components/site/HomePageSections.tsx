@@ -5,6 +5,21 @@ import { NewsletterSubscribeForm } from '@/components/site/NewsletterSubscribeFo
 import type { FeedItem } from '@/lib/homeFeed';
 import { LODGE_ADDRESS, googleMapsLodgeUrl, googleStreetViewOpenUrl } from '@/lib/lodgeLocation';
 
+const WORLDWIDE_COUNTRIES = [
+  'United States',
+  'Canada',
+  'Brazil',
+  'Argentina',
+  'Philippines',
+  'Australia',
+  'Germany',
+  'France',
+  'Italy',
+  'Japan',
+  'South Africa',
+  'Mexico',
+] as const;
+
 interface HomePageSectionsProps {
   feedItems: FeedItem[];
 }
@@ -94,72 +109,68 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
             </div>
           </div>
 
-          {/* DeMolay Worldwide Map */}
+          {/* DeMolay Worldwide: Earth's horizon seen through a capsule cabin window */}
           <div className="mx-auto mt-8 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] md:mt-12">
-            <div className="glass relative overflow-hidden rounded-3xl p-6 backdrop-blur-xl md:p-8">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-              <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <section className="orbit-cabin px-5 pb-5 pt-10 md:px-10 md:pt-14" aria-labelledby="worldwide-heading">
+              <div className="relative z-10 text-center">
+                <p className="inline-flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.24em] text-foreground/60 md:text-xs">
+                  <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#d4af37]" />
+                  Worldwide Brotherhood · Active Jurisdictions
+                </p>
+                <h2 id="worldwide-heading" className="font-serif mt-4 text-3xl font-bold leading-tight text-foreground md:text-5xl">
+                  DeMolay around the world,
+                </h2>
+                <p className="font-serif text-2xl leading-tight text-foreground/50 md:text-4xl">one brotherhood.</p>
+              </div>
+
+              <div className="orbit-window-frame relative z-10 mx-auto mt-8 w-full max-w-5xl md:mt-12">
+                <div
+                  className="orbit-window"
+                  role="img"
+                  aria-label="Earth's horizon seen from orbit, with DeMolay pins in Canada, the United States, Europe and Japan."
+                >
+                  <div className="orbit-planet">
+                    <div className="orbit-planet-surface" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-8 grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-end">
                 <div>
-                  <p className="font-semibold uppercase tracking-[0.22em] text-gold/95 text-[0.72rem] md:text-xs">
-                    Worldwide Brotherhood
-                  </p>
-                  <h2 className="font-serif mt-2 text-2xl font-bold leading-tight text-foreground md:text-3xl">
-                    DeMolay Around the World
-                  </h2>
-                  <p className="mt-2 max-w-2xl text-sm text-foreground/75 md:text-base">
+                  <p className="text-sm font-semibold text-foreground">Beyond our chapter.</p>
+                  <p className="mt-1 max-w-xs text-sm text-foreground/60">
                     Active chapters span across continents, united by the same values of leadership, service, and brotherhood.
                   </p>
                 </div>
-                <div className="text-foreground/60 text-xs uppercase tracking-[0.2em]">Active Jurisdictions</div>
-              </div>
-              <div className="grid items-center gap-8 lg:grid-cols-[280px_1fr]">
-                <div className="relative mx-auto flex h-[250px] w-[250px] items-center justify-center">
-                  <div
-                    className="section-banner"
-                    role="img"
-                    aria-label="Rotating Earth with DeMolay pins in Canada, the United States, Brazil, Europe, Japan, the Philippines, and Australia."
-                  />
-                  <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
-                    {Array.from({ length: 7 }, (_, index) => (
-                      <div key={index} id={`star-${index + 1}`}>
-                        <div className="curved-corner-star">
-                          <div className="curved-corner-bottomright" />
-                          <div className="curved-corner-bottomleft" />
-                        </div>
-                        <div className="curved-corner-star">
-                          <div className="curved-corner-topright" />
-                          <div className="curved-corner-topleft" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                  {[
-                    'United States',
-                    'Canada',
-                    'Brazil',
-                    'Argentina',
-                    'Philippines',
-                    'Australia',
-                    'Germany',
-                    'France',
-                    'Italy',
-                    'Japan',
-                    'South Africa',
-                    'Mexico',
-                  ].map((country) => (
-                    <div
+                <ul className="flex max-w-xl flex-wrap justify-center gap-2" aria-label="Countries with DeMolay chapters">
+                  {WORLDWIDE_COUNTRIES.map((country) => (
+                    <li
                       key={country}
-                      className="flex items-center gap-2 rounded-xl border border-gold/15 bg-black/25 px-3 py-2 text-sm text-foreground/80"
+                      className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-foreground/75"
                     >
-                      <span className="h-1.5 w-1.5 rounded-full bg-gold/80 shadow-[0_0_8px_rgba(212,175,55,0.5)]" />
                       {country}
-                    </div>
+                    </li>
                   ))}
+                </ul>
+                <div className="md:text-right">
+                  <p className="text-sm font-semibold text-foreground">Order of DeMolay</p>
+                  <p className="mt-1 text-sm text-foreground/60">International youth fraternity</p>
                 </div>
               </div>
-            </div>
+
+              <div className="relative z-10 mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-foreground/45">
+                <span>T. De Leon Chapter No. 47</span>
+                <span className="flex flex-wrap gap-6">
+                  <span>
+                    Countries <b className="font-semibold text-foreground/85">{WORLDWIDE_COUNTRIES.length}</b>
+                  </span>
+                  <span>
+                    Continents <b className="font-semibold text-foreground/85">6</b>
+                  </span>
+                </span>
+                <span>Ilagan, Isabela</span>
+              </div>
+            </section>
           </div>
 
           {/* Lodge CTA merged into the same "chapter feed" area */}

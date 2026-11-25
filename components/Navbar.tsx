@@ -50,16 +50,27 @@ export default function Navbar() {
         initial={{ y: -72, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-3 sm:top-5"
+        className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4 sm:top-5 sm:px-8 lg:px-12 xl:px-16"
       >
-        {/* Geometry is measured from the design reference: 750×56 units on desktop, center tab only on mobile. */}
+        {/* Glass wings stretch to the hero's side margins; they tuck under the fixed-size gold center tab. */}
         <div
-          className={`nav-ref pointer-events-auto relative aspect-[420/56] w-[min(92vw,360px)] lg:aspect-[750/56] lg:w-[min(63vw,980px)] ${
+          className={`nav-ref pointer-events-auto flex w-full max-w-[360px] items-start justify-center lg:max-w-none ${
             scrolled ? 'nav-ref-scrolled' : ''
           }`}
         >
-          <NavShape variant="desktop" className="absolute inset-0 hidden h-full w-full lg:block" />
-          <NavShape variant="mobile" className="absolute inset-0 h-full w-full lg:hidden" />
+          <nav
+            className="nav-wing nav-wing-left backdrop-blur-[18px] backdrop-saturate-150 relative z-0 -mr-12 mt-[2px] hidden h-[59px] flex-1 items-center gap-8 pl-9 lg:flex"
+            aria-label="Primary"
+          >
+            {NAV.slice(0, 2).map((item) => (
+              <NavLink key={item.href} href={item.href} active={isActive(item.href)}>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="relative z-10 aspect-[420/56] w-full shrink-0 lg:w-[504px]">
+          <NavShape className="nav-ref-shape absolute inset-0 h-full w-full" />
 
           <div className="pointer-events-none absolute inset-x-0 top-0 flex h-[92%] items-center justify-center">
             <NavSlot>
@@ -100,16 +111,9 @@ export default function Navbar() {
               </button>
             </NavSlot>
           </div>
+          </div>
 
-          <nav className="absolute left-[4.3%] top-0 hidden h-[92%] items-center gap-8 lg:flex" aria-label="Primary">
-            {NAV.slice(0, 2).map((item) => (
-              <NavLink key={item.href} href={item.href} active={isActive(item.href)}>
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="absolute right-[4.3%] top-0 hidden h-[92%] items-center gap-3 lg:flex">
+          <div className="nav-wing nav-wing-right backdrop-blur-[18px] backdrop-saturate-150 relative z-0 -ml-12 mt-[2px] hidden h-[59px] flex-1 items-center justify-end gap-3 pr-9 lg:flex">
             <button
               type="button"
               onClick={openJoin}
@@ -211,57 +215,32 @@ function NavLink({
   );
 }
 
-/** Equal-width slots put the center icons at the reference's spacing (~6.9% of the bar on desktop). */
+/** Equal-width slots put the center icons at the reference's spacing (52 of the tab's 420 units). */
 function NavSlot({ className = '', children }: { className?: string; children: React.ReactNode }) {
-  return (
-    <div className={`pointer-events-auto flex w-[12.4%] justify-center lg:w-[6.9%] ${className}`}>{children}</div>
-  );
+  return <div className={`pointer-events-auto flex w-[12.4%] justify-center ${className}`}>{children}</div>;
 }
 
 function NavDivider() {
   return <span className="block h-5 w-px bg-[#1a0a0d]/40" aria-hidden />;
 }
 
+// Center tab + its dark socket, measured from the design reference (viewBox crops the 750-unit bar to the tab).
 const CENTER_PATH =
   'M190 2H562.5Q572.5 2 567 10L545 47Q542.5 51 538 51H214.5Q210 51 207.5 47L185.5 10Q180 2 190 2Z';
 const SOCKET_PATH =
   'M178 0H574.5Q586 0 580 9L556 52Q554 55 549 55H203.5Q198.5 55 196.5 52L172.5 9Q166.5 0 178 0Z';
-const LEFT_PILL_PATH = 'M10 2H230L260 51H20Q13 51 11.5 46L0.8 8Q0 2 10 2Z';
-const RIGHT_PILL_PATH = 'M740 2H520L490 51H730Q737 51 738.5 46L749.2 8Q750 2 740 2Z';
 
-function NavShape({ variant, className }: { variant: 'desktop' | 'mobile'; className: string }) {
-  const id = `nav-${variant}`;
+function NavShape({ className }: { className: string }) {
   return (
-    <svg
-      className={className}
-      viewBox={variant === 'desktop' ? '0 0 750 56' : '166 0 420 56'}
-      preserveAspectRatio="none"
-      aria-hidden
-    >
+    <svg className={className} viewBox="166 0 420 56" preserveAspectRatio="none" aria-hidden>
       <defs>
-        <linearGradient id={`${id}-pill-l`} x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0" stopColor="#9c3a4e" stopOpacity="0.92" />
-          <stop offset="0.55" stopColor="#5e1a28" stopOpacity="0.9" />
-          <stop offset="1" stopColor="#2e0b12" stopOpacity="0.92" />
-        </linearGradient>
-        <linearGradient id={`${id}-pill-r`} x1="1" x2="0" y1="0" y2="0">
-          <stop offset="0" stopColor="#9c3a4e" stopOpacity="0.92" />
-          <stop offset="0.55" stopColor="#5e1a28" stopOpacity="0.9" />
-          <stop offset="1" stopColor="#2e0b12" stopOpacity="0.92" />
-        </linearGradient>
-        <linearGradient id={`${id}-center`} x1="0" x2="0" y1="0" y2="1">
+        <linearGradient id="nav-center-fill" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0" stopColor="#efd47e" />
           <stop offset="1" stopColor="#d4af37" />
         </linearGradient>
       </defs>
-      {variant === 'desktop' ? (
-        <>
-          <path d={LEFT_PILL_PATH} fill={`url(#${id}-pill-l)`} stroke="rgba(255,255,255,0.14)" vectorEffect="non-scaling-stroke" />
-          <path d={RIGHT_PILL_PATH} fill={`url(#${id}-pill-r)`} stroke="rgba(255,255,255,0.14)" vectorEffect="non-scaling-stroke" />
-        </>
-      ) : null}
       <path d={SOCKET_PATH} fill="#12060a" fillOpacity="0.92" />
-      <path d={CENTER_PATH} fill={`url(#${id}-center)`} />
+      <path d={CENTER_PATH} fill="url(#nav-center-fill)" />
       <path d="M192 3.2H560.5" stroke="rgba(255,255,255,0.55)" vectorEffect="non-scaling-stroke" />
     </svg>
   );
