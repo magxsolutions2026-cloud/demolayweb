@@ -1,6 +1,7 @@
 import { query } from '@/lib/db';
 
-export const dynamic = 'force-dynamic';
+/** Cached and refreshed in the background at most once a minute, so navigation is instant. */
+export const revalidate = 60;
 
 const LEGACY_ABOUT_TEXT =
   'We are young men committed to the seven Cardinal Virtues: Filial love, Reverence for sacred things, Courtesy, Comradeship, Fidelity, Cleanness, and Patriotism. Our chapter meets regularly for ritual, service projects, and leadership development. Whether you are exploring membership or reconnecting with DeMolay, you will find a welcoming circle rooted in Masonic tradition and modern purpose.';

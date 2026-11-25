@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import { HERO_POSTER_SRC, HERO_VIDEO_CLASS_NAME, HERO_VIDEO_FRAME_CLASS_NAME } from './heroVideoFrame';
 
 const FORWARD_VIDEO_SRC = '/hero-background.mp4';
 const REVERSE_VIDEO_SRC = '/hero-background-reverse.mp4';
@@ -9,10 +10,6 @@ const IDLE_VIDEO_SRC = '/hero-idle.mp4';
 const EDGE_EPSILON = 0.04;
 const CROSSFADE_MS = 260;
 const HERO_ORBIT_EXTRA_VIEWPORTS = 0.35;
-const HERO_VIDEO_FRAME_CLASS_NAME =
-  'absolute inset-0 scale-100 drop-shadow-[0_32px_70px_rgba(0,0,0,0.88)] md:scale-[0.86] md:translate-y-5 md:drop-shadow-[0_42px_96px_rgba(0,0,0,0.9)]';
-const HERO_VIDEO_CLASS_NAME =
-  `${HERO_VIDEO_FRAME_CLASS_NAME} h-full w-full object-cover object-center transition-opacity duration-300 md:object-contain`;
 
 type ScrollDirection = 'down' | 'up';
 type VideoLayer = 'forward' | 'reverse';
@@ -414,11 +411,15 @@ export default function HomeHeroVideoBackground() {
       aria-hidden
     >
       <div className="absolute inset-0 bg-black" />
+      {/* Poster under the videos: visible at once, covered as soon as a video paints. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- static public file, must match the video framing */}
+      <img src={HERO_POSTER_SRC} alt="" className={HERO_VIDEO_CLASS_NAME} fetchPriority="high" />
 
       <video
         ref={idleRef}
         muted
         playsInline
+        poster={HERO_POSTER_SRC}
         preload="auto"
         loop
         disablePictureInPicture
@@ -450,7 +451,7 @@ export default function HomeHeroVideoBackground() {
         ref={forwardRef}
         muted
         playsInline
-        preload="auto"
+        preload={idleReady || idleError ? 'auto' : 'metadata'}
         disablePictureInPicture
         disableRemotePlayback
         tabIndex={-1}
@@ -480,7 +481,7 @@ export default function HomeHeroVideoBackground() {
         ref={reverseRef}
         muted
         playsInline
-        preload="auto"
+        preload={idleReady || idleError ? 'auto' : 'metadata'}
         disablePictureInPicture
         disableRemotePlayback
         tabIndex={-1}

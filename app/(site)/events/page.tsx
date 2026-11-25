@@ -3,7 +3,8 @@ import { query } from '@/lib/db';
 import { normalizeEventCategory } from '@/lib/eventCategory';
 import { formatSqlDate } from '@/lib/formatDb';
 
-export const dynamic = 'force-dynamic';
+/** Cached and refreshed in the background at most once a minute, so navigation is instant. */
+export const revalidate = 60;
 
 interface EventItem {
   id: number;

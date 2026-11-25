@@ -1,7 +1,8 @@
 import OfficersCarousel from '@/components/site/OfficersCarousel';
 import { listOfficersOrderedByName } from '@/lib/officersDb';
 
-export const dynamic = 'force-dynamic';
+/** Cached and refreshed in the background at most once a minute, so navigation is instant. */
+export const revalidate = 60;
 
 async function fetchOfficers() {
   try {
