@@ -1,15 +1,84 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { PH_CHAPTER_PINS } from '@/lib/phChapterPins';
 
-/** T. De Leon Chapter No. 47 — Ilagan, Isabela. */
+/** T. De Leon Chapter No. 47 — Ilagan, Isabela (also the home pin in PH_CHAPTER_PINS). */
 const ILAGAN = { lat: 17.148, lon: 121.889 };
 /** Point the camera frames: the middle of the archipelago. */
-const PH_FOCUS = { lat: 13.8, lon: 122.0 };
+const PH_FOCUS = { lat: 11.6, lon: 122.4 };
 /** Camera: altitude above the surface (Earth radii), vertical FOV, and where the horizon sits. */
-const ORBIT = { altitude: 0.27, fov: 17, horizonFromTop: 0.24, focusFromTop: 0.6 };
+const ORBIT = { altitude: 0.34, fov: 19, horizonFromTop: 0.2, focusFromTop: 0.56 };
 /** Bounds of the high-resolution NASA crop in /images/earth-ph-hires.jpg (degrees). */
 const PATCH = { lonMin: 114, lonMax: 130, latMin: 3, latMax: 22 };
+
+/** Pin sprite canvas is 128×168; the tip sits at y = 160, i.e. 8 px above the bottom edge. */
+const PIN_CANVAS = { w: 128, h: 168, tipY: 160 };
+const PIN_ASPECT = PIN_CANVAS.w / PIN_CANVAS.h;
+const PIN_TIP_Y = (PIN_CANVAS.h - PIN_CANVAS.tipY) / PIN_CANVAS.h;
+
+/** Glossy teardrop map pin with a white disc showing the chapter count; gold for our home province. */
+function drawPin(count: number, home: boolean) {
+  const canvas = document.createElement('canvas');
+  canvas.width = PIN_CANVAS.w;
+  canvas.height = PIN_CANVAS.h;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
+
+  const cx = 64;
+  const cy = 58;
+  const r = 44;
+  const outline = () => {
+    ctx.beginPath();
+    ctx.moveTo(cx, PIN_CANVAS.tipY);
+    ctx.bezierCurveTo(cx - 14, 134, cx - r, 104, cx - r, cy);
+    ctx.arc(cx, cy, r, Math.PI, 0);
+    ctx.bezierCurveTo(cx + r, 104, cx + 14, 134, cx, PIN_CANVAS.tipY);
+    ctx.closePath();
+  };
+
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 3;
+  outline();
+  const body = ctx.createRadialGradient(cx - 16, cy - 18, 6, cx, cy + 12, 84);
+  if (home) {
+    body.addColorStop(0, '#fff1bf');
+    body.addColorStop(0.45, '#e2bd4f');
+    body.addColorStop(1, '#8a6512');
+  } else {
+    body.addColorStop(0, '#ff8a7a');
+    body.addColorStop(0.45, '#d9262b');
+    body.addColorStop(1, '#6e0a10');
+  }
+  ctx.fillStyle = body;
+  ctx.fill();
+  ctx.restore();
+
+  outline();
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = home ? 'rgba(255, 246, 214, 0.95)' : 'rgba(255, 255, 255, 0.92)';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+  ctx.fillStyle = home ? '#1a0a0d' : '#ffffff';
+  ctx.fill();
+
+  ctx.fillStyle = home ? '#f3d27a' : '#a3121a';
+  ctx.font = `800 ${count >= 5 ? 26 : 32}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(count >= 5 ? '5+' : String(count), cx, cy + 2);
+
+  // Specular highlight on the upper-left of the head.
+  ctx.beginPath();
+  ctx.ellipse(cx - 19, cy - 24, 13, 7, -0.6, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.fill();
+  return canvas;
+}
 
 const VERTEX = /* glsl */ `
   varying vec2 vUv;
@@ -308,42 +377,51 @@ export default function PhilippinesGlobe() {
       });
       scene.add(new THREE.Mesh(atmoGeo, atmoMat));
 
-      // Ilagan pin: glowing dot, short light beam, and a pulsing ring, all on the surface normal.
-      const pinPos = toVec(ILAGAN.lat, ILAGAN.lon, 1.0015);
-      const pinNormal = pinPos.clone().normalize();
-      const gold = new THREE.Color('#f3d27a');
-      const pin = new THREE.Group();
-      pin.position.copy(pinPos);
-      pin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), pinNormal);
-      globe.add(pin);
-
-      const dotGeo = new THREE.SphereGeometry(0.0042, 24, 24);
-      const dotMat = new THREE.MeshBasicMaterial({ color: gold, toneMapped: false });
-      pin.add(new THREE.Mesh(dotGeo, dotMat));
-
-      const beamGeo = new THREE.CylinderGeometry(0.0005, 0.0005, 0.022, 12);
-      beamGeo.rotateX(Math.PI / 2);
-      beamGeo.translate(0, 0, 0.011);
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: gold,
-        transparent: true,
-        opacity: 0.75,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        toneMapped: false,
+      // Chapter pins: billboarded map-pin sprites (tip on the surface), sized by chapters per province.
+      const pinTextures = new Map<string, InstanceType<typeof THREE.CanvasTexture>>();
+      const pinTexture = (count: number, home: boolean) => {
+        const key = `${count}-${home}`;
+        let tex = pinTextures.get(key);
+        if (!tex) {
+          tex = new THREE.CanvasTexture(drawPin(count, home));
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = maxAniso;
+          pinTextures.set(key, tex);
+        }
+        return tex;
+      };
+      const pins = PH_CHAPTER_PINS.map((chapter, i) => {
+        const material = new THREE.SpriteMaterial({
+          map: pinTexture(chapter.count, Boolean(chapter.home)),
+          depthTest: false,
+          depthWrite: false,
+          toneMapped: false,
+        });
+        const sprite = new THREE.Sprite(material);
+        sprite.center.set(0.5, PIN_TIP_Y);
+        sprite.position.copy(toVec(chapter.lat, chapter.lon, 1.0005));
+        // Home pin on top, then smaller pins over bigger ones so none get buried in crowded areas.
+        sprite.renderOrder = chapter.home ? 20 : 10 - chapter.count;
+        globe.add(sprite);
+        const height = chapter.home ? 0.03 : 0.0125 + chapter.count * 0.0028;
+        return { sprite, material, height, delay: 0.25 + i * 0.035, home: Boolean(chapter.home) };
       });
-      pin.add(new THREE.Mesh(beamGeo, beamMat));
+      const homePin = pins.find((pin) => pin.home);
 
+      // Pulsing gold ring around the home pin's tip, lying flat on the surface.
       const ringGeo = new THREE.RingGeometry(0.006, 0.0078, 64);
       const ringMat = new THREE.MeshBasicMaterial({
-        color: gold,
+        color: new THREE.Color('#f3d27a'),
         transparent: true,
         side: THREE.DoubleSide,
         depthWrite: false,
         toneMapped: false,
       });
       const ring = new THREE.Mesh(ringGeo, ringMat);
-      pin.add(ring);
+      const homeSurface = toVec(ILAGAN.lat, ILAGAN.lon, 1.001);
+      ring.position.copy(homeSurface);
+      ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), homeSurface.clone().normalize());
+      globe.add(ring);
 
       const resize = () => {
         const { clientWidth: w, clientHeight: h } = host;
@@ -371,13 +449,21 @@ export default function PhilippinesGlobe() {
         clouds.rotation.y = t * 0.0035;
         cloudMat.uniforms.uTime.value = t;
 
+        // Pins drop in one after another, with a slight overshoot.
+        const since = reduceMotion ? Infinity : t;
+        for (const pin of pins) {
+          const k = Math.min(Math.max((since - pin.delay) / 0.5, 0), 1);
+          const pop = k === 0 ? 0 : 1 + 2.4 * Math.pow(k - 1, 3) + 1.4 * Math.pow(k - 1, 2);
+          pin.sprite.scale.set(pin.height * PIN_ASPECT * pop, pin.height * pop, 1);
+        }
+
         const pulse = (t * 0.55) % 1;
         ring.scale.setScalar(1 + pulse * 3.2);
         ringMat.opacity = (1 - pulse) * 0.9;
 
         renderer.render(scene, camera);
 
-        pin.getWorldPosition(labelPos);
+        if (homePin) homePin.sprite.getWorldPosition(labelPos);
         labelPos.project(camera);
         label.style.transform = `translate(${((labelPos.x + 1) / 2) * host.clientWidth}px, ${
           ((1 - labelPos.y) / 2) * host.clientHeight
@@ -410,8 +496,9 @@ export default function PhilippinesGlobe() {
         cancelAnimationFrame(frame);
         io.disconnect();
         ro.disconnect();
-        [earthGeo, cloudGeo, atmoGeo, dotGeo, beamGeo, ringGeo].forEach((g) => g.dispose());
-        [earthMat, cloudMat, atmoMat, dotMat, beamMat, ringMat].forEach((m) => m.dispose());
+        [earthGeo, cloudGeo, atmoGeo, ringGeo].forEach((g) => g.dispose());
+        [earthMat, cloudMat, atmoMat, ringMat, ...pins.map((pin) => pin.material)].forEach((m) => m.dispose());
+        pinTextures.forEach((tex) => tex.dispose());
         day.dispose();
         patch.dispose();
         renderer.dispose();
@@ -432,7 +519,7 @@ export default function PhilippinesGlobe() {
         className="pointer-events-none absolute left-0 top-0 z-10 opacity-0 transition-opacity duration-700"
         aria-hidden
       >
-        <div className="-translate-y-[130%] translate-x-3 whitespace-nowrap rounded-full border border-gold/40 bg-black/55 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-gold backdrop-blur-md md:text-[0.68rem]">
+        <div className="-translate-y-[210%] translate-x-5 whitespace-nowrap rounded-full border border-gold/40 bg-black/55 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-gold backdrop-blur-md md:text-[0.68rem]">
           Ilagan, Isabela
         </div>
       </div>

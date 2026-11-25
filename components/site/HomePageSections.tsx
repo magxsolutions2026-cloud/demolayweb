@@ -127,10 +127,16 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
                     and brotherhood. <span className="text-foreground/40">(As of February 2023.)</span>
                   </p>
                 </div>
-                <p className="flex items-center justify-center gap-2 text-sm text-foreground/75">
-                  <span className="h-2 w-2 rounded-full bg-gold shadow-[0_0_10px_#d4af37]" />
-                  Our home: Ilagan, Isabela
-                </p>
+                <div className="flex flex-col items-center gap-1.5 text-sm text-foreground/75">
+                  <p className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-gold shadow-[0_0_10px_#d4af37]" />
+                    Our home: Ilagan, Isabela
+                  </p>
+                  <p className="flex items-center gap-2 text-xs text-foreground/55">
+                    <span className="h-2 w-2 rounded-full bg-[#d9262b] shadow-[0_0_8px_rgba(217,38,43,0.7)]" />
+                    Chapters per province (estimated)
+                  </p>
+                </div>
                 <div className="md:text-right">
                   <p className="text-sm font-semibold text-foreground">Supreme Council of the Philippines</p>
                   <p className="mt-1 text-sm text-foreground/60">Instituted May 4, 1983</p>
