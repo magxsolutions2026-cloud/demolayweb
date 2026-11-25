@@ -2,23 +2,9 @@ import HomeFeed from '@/components/site/HomeFeed';
 import HomeHeroVideoDynamic from '@/components/site/HomeHeroVideoDynamic';
 import InteractiveHeroHUD from '@/components/site/InteractiveHeroHUD';
 import { NewsletterSubscribeForm } from '@/components/site/NewsletterSubscribeForm';
+import PhilippinesGlobe from '@/components/site/PhilippinesGlobe';
 import type { FeedItem } from '@/lib/homeFeed';
 import { LODGE_ADDRESS, googleMapsLodgeUrl, googleStreetViewOpenUrl } from '@/lib/lodgeLocation';
-
-const WORLDWIDE_COUNTRIES = [
-  'United States',
-  'Canada',
-  'Brazil',
-  'Argentina',
-  'Philippines',
-  'Australia',
-  'Germany',
-  'France',
-  'Italy',
-  'Japan',
-  'South Africa',
-  'Mexico',
-] as const;
 
 interface HomePageSectionsProps {
   feedItems: FeedItem[];
@@ -109,52 +95,45 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
             </div>
           </div>
 
-          {/* DeMolay Worldwide: Earth's horizon seen through a capsule cabin window */}
+          {/* Philippine DeMolay: a 3D Earth over the Philippines, seen through a capsule cabin window */}
           <div className="mx-auto mt-8 w-full max-w-7xl xl:max-w-[1440px] 2xl:max-w-[1600px] md:mt-12">
             <section className="orbit-cabin px-5 pb-5 pt-10 md:px-10 md:pt-14" aria-labelledby="worldwide-heading">
               <div className="relative z-10 text-center">
                 <p className="inline-flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.24em] text-foreground/60 md:text-xs">
                   <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#d4af37]" />
-                  Worldwide Brotherhood · Active Jurisdictions
+                  Philippine Jurisdiction · Supreme Council
                 </p>
                 <h2 id="worldwide-heading" className="font-serif mt-4 text-3xl font-bold leading-tight text-foreground md:text-5xl">
-                  DeMolay around the world,
+                  DeMolay in the Philippines,
                 </h2>
-                <p className="font-serif text-2xl leading-tight text-foreground/50 md:text-4xl">one brotherhood.</p>
+                <p className="font-serif text-2xl leading-tight text-foreground/50 md:text-4xl">seen from orbit.</p>
               </div>
 
               <div className="orbit-window-frame relative z-10 mx-auto mt-8 w-full max-w-5xl md:mt-12">
                 <div
                   className="orbit-window"
                   role="img"
-                  aria-label="Earth's horizon seen from orbit, with DeMolay pins in Canada, the United States, Europe and Japan."
+                  aria-label="3D Earth seen from low orbit over the Philippines, with a gold pin on Ilagan, Isabela."
                 >
-                  <div className="orbit-planet">
-                    <div className="orbit-planet-surface" />
-                  </div>
+                  <PhilippinesGlobe />
                 </div>
               </div>
 
               <div className="relative z-10 mt-8 grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-end">
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Beyond our chapter.</p>
+                  <p className="text-sm font-semibold text-foreground">113 chapters across the islands.</p>
                   <p className="mt-1 max-w-xs text-sm text-foreground/60">
-                    Active chapters span across continents, united by the same values of leadership, service, and brotherhood.
+                    From Luzon to Mindanao, Philippine DeMolay chapters share the same values of leadership, service,
+                    and brotherhood. <span className="text-foreground/40">(As of February 2023.)</span>
                   </p>
                 </div>
-                <ul className="flex max-w-xl flex-wrap justify-center gap-2" aria-label="Countries with DeMolay chapters">
-                  {WORLDWIDE_COUNTRIES.map((country) => (
-                    <li
-                      key={country}
-                      className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-foreground/75"
-                    >
-                      {country}
-                    </li>
-                  ))}
-                </ul>
+                <p className="flex items-center justify-center gap-2 text-sm text-foreground/75">
+                  <span className="h-2 w-2 rounded-full bg-gold shadow-[0_0_10px_#d4af37]" />
+                  Our home: Ilagan, Isabela
+                </p>
                 <div className="md:text-right">
-                  <p className="text-sm font-semibold text-foreground">Order of DeMolay</p>
-                  <p className="mt-1 text-sm text-foreground/60">International youth fraternity</p>
+                  <p className="text-sm font-semibold text-foreground">Supreme Council of the Philippines</p>
+                  <p className="mt-1 text-sm text-foreground/60">Instituted May 4, 1983</p>
                 </div>
               </div>
 
@@ -162,10 +141,13 @@ export default function HomePageSections({ feedItems }: HomePageSectionsProps) {
                 <span>T. De Leon Chapter No. 47</span>
                 <span className="flex flex-wrap gap-6">
                   <span>
-                    Countries <b className="font-semibold text-foreground/85">{WORLDWIDE_COUNTRIES.length}</b>
+                    Lat <b className="font-semibold text-foreground/85">17.15° N</b>
                   </span>
                   <span>
-                    Continents <b className="font-semibold text-foreground/85">6</b>
+                    Lon <b className="font-semibold text-foreground/85">121.89° E</b>
+                  </span>
+                  <span>
+                    Over <b className="font-semibold text-foreground/85">Northern Luzon</b>
                   </span>
                 </span>
                 <span>Ilagan, Isabela</span>
