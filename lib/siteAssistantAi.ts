@@ -5,7 +5,9 @@ import { siteAssistantKnowledgeText } from '@/lib/siteAssistant';
 /** Groq (free tier, OpenAI-compatible). Set GROQ_API_KEY; GROQ_MODEL is optional. */
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODELS_URL = 'https://api.groq.com/openai/v1/models';
-const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+const DEFAULT_MODEL = 'openai/gpt-oss-120b';
+/** Hard cap on one reply (request + streaming), well under Vercel's function limit. */
+const REPLY_TIMEOUT_MS = 60_000;
 
 /** Groq retires models over time; when the configured one 404s we pick a live chat model and remember it. */
 const NON_CHAT_MODEL = /whisper|tts|guard|embed|audio|speech|playai|orpheus|distil/i;
@@ -109,12 +111,13 @@ export async function streamAssistantReply(history: AssistantTurn[]): Promise<Re
   if (!apiKey) return null;
 
   const messages = [{ role: 'system', content: await systemPrompt() }, ...history];
+  const deadline = AbortSignal.timeout(REPLY_TIMEOUT_MS);
   const request = (model: string) =>
     fetch(GROQ_URL, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model, messages, stream: true, temperature: 0.4, ...reasoningOptions(model) }),
-      signal: AbortSignal.timeout(20_000),
+      signal: deadline,
     });
 
   let response: Response;
@@ -137,7 +140,8 @@ export async function streamAssistantReply(history: AssistantTurn[]): Promise<Re
     return null;
   }
 
-  // Groq streams server-sent events; forward only the text deltas.
+  // Groq streams server-sent events; forward only the text deltas. Each pull keeps reading until it has
+  // text to send: chunks without content (role, reasoning) must not end a pull, or the stream stalls.
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
@@ -145,23 +149,36 @@ export async function streamAssistantReply(history: AssistantTurn[]): Promise<Re
 
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
-      const { done, value } = await reader.read();
-      if (done) {
-        controller.close();
-        return;
-      }
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() ?? '';
-      for (const line of lines) {
-        const data = line.trim();
-        if (!data.startsWith('data:')) continue;
-        const payload = data.slice(5).trim();
-        if (payload === '[DONE]') continue;
+      while (true) {
+        let chunk: ReadableStreamReadResult<Uint8Array>;
         try {
-          const text = JSON.parse(payload).choices?.[0]?.delta?.content;
-          if (text) controller.enqueue(encoder.encode(text));
-        } catch {}
+          chunk = await reader.read();
+        } catch {
+          controller.close(); // deadline hit or connection dropped: end with what was sent
+          return;
+        }
+        if (chunk.done) {
+          controller.close();
+          return;
+        }
+        buffer += decoder.decode(chunk.value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+        let sent = false;
+        for (const line of lines) {
+          const data = line.trim();
+          if (!data.startsWith('data:')) continue;
+          const payload = data.slice(5).trim();
+          if (payload === '[DONE]') continue;
+          try {
+            const text = JSON.parse(payload).choices?.[0]?.delta?.content;
+            if (text) {
+              controller.enqueue(encoder.encode(text));
+              sent = true;
+            }
+          } catch {}
+        }
+        if (sent) return;
       }
     },
     cancel() {
