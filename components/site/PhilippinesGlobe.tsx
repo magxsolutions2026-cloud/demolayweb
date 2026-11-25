@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { PH_CHAPTER_PINS } from '@/lib/phChapterPins';
 
-/** T. De Leon Chapter No. 47 — Ilagan, Isabela (also the home pin in PH_CHAPTER_PINS). */
+/** T. De Leon Chapter No. 47 — Ilagan, Isabela (also the home pin in PH_CHAPTER_PINS); pins ripple out from here. */
 const ILAGAN = { lat: 17.148, lon: 121.889 };
 /** Point the camera frames: the middle of the archipelago. */
 const PH_FOCUS = { lat: 11.6, lon: 122.4 };
@@ -12,73 +12,81 @@ const ORBIT = { altitude: 0.34, fov: 19, horizonFromTop: 0.2, focusFromTop: 0.56
 /** Bounds of the high-resolution NASA crop in /images/earth-ph-hires.jpg (degrees). */
 const PATCH = { lonMin: 114, lonMax: 130, latMin: 3, latMax: 22 };
 
-/** Pin sprite canvas is 128×168; the tip sits at y = 160, i.e. 8 px above the bottom edge. */
-const PIN_CANVAS = { w: 128, h: 168, tipY: 160 };
+/** Pin sprite canvas is 256×336; the tip sits at y = 320, i.e. 16 px above the bottom edge. */
+const PIN_CANVAS = { w: 256, h: 336, tipY: 320 };
 const PIN_ASPECT = PIN_CANVAS.w / PIN_CANVAS.h;
 const PIN_TIP_Y = (PIN_CANVAS.h - PIN_CANVAS.tipY) / PIN_CANVAS.h;
 
-/** Glossy teardrop map pin with a white disc showing the chapter count; gold for our home province. */
-function drawPin(count: number, home: boolean) {
+/** Pop-in / hide loop for the pins, in seconds. Pins start hidden. */
+const PIN_CYCLE = { hiddenStart: 0.8, popSpread: 4.2, popDur: 0.55, hold: 4.5, hideDur: 0.6, hiddenEnd: 1.4 };
+const PIN_CYCLE_LENGTH =
+  PIN_CYCLE.hiddenStart + PIN_CYCLE.popSpread + PIN_CYCLE.popDur + PIN_CYCLE.hold + PIN_CYCLE.hideDur + PIN_CYCLE.hiddenEnd;
+
+/** Scale (0–1, with overshoot while popping) of a pin `delay` seconds into the spread at cycle phase `p`. */
+function pinScale(p: number, delay: number, hideJitter: number) {
+  const popStart = PIN_CYCLE.hiddenStart + delay;
+  const hideStart = PIN_CYCLE.hiddenStart + PIN_CYCLE.popSpread + PIN_CYCLE.popDur + PIN_CYCLE.hold + hideJitter;
+  if (p < popStart) return 0;
+  if (p < popStart + PIN_CYCLE.popDur) {
+    const k = (p - popStart) / PIN_CYCLE.popDur - 1; // easeOutBack
+    return 1 + 2.70158 * k * k * k + 1.70158 * k * k;
+  }
+  if (p < hideStart) return 1;
+  if (p < hideStart + PIN_CYCLE.hideDur) {
+    const k = (p - hideStart) / PIN_CYCLE.hideDur; // easeInBack, shrinking away
+    return Math.max(0, 1 - (2.70158 * k * k * k - 1.70158 * k * k));
+  }
+  return 0;
+}
+
+/** Plain red teardrop map pin with a logo in its head (DeMolay emblem, or the chapter logo at home). */
+function drawPin(logo: HTMLImageElement | null, home: boolean) {
   const canvas = document.createElement('canvas');
   canvas.width = PIN_CANVAS.w;
   canvas.height = PIN_CANVAS.h;
   const ctx = canvas.getContext('2d');
   if (!ctx) return canvas;
 
-  const cx = 64;
-  const cy = 58;
-  const r = 44;
-  const outline = () => {
-    ctx.beginPath();
-    ctx.moveTo(cx, PIN_CANVAS.tipY);
-    ctx.bezierCurveTo(cx - 14, 134, cx - r, 104, cx - r, cy);
-    ctx.arc(cx, cy, r, Math.PI, 0);
-    ctx.bezierCurveTo(cx + r, 104, cx + 14, 134, cx, PIN_CANVAS.tipY);
-    ctx.closePath();
-  };
-
-  ctx.save();
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
-  ctx.shadowBlur = 8;
-  ctx.shadowOffsetY = 3;
-  outline();
-  const body = ctx.createRadialGradient(cx - 16, cy - 18, 6, cx, cy + 12, 84);
-  if (home) {
-    body.addColorStop(0, '#fff1bf');
-    body.addColorStop(0.45, '#e2bd4f');
-    body.addColorStop(1, '#8a6512');
-  } else {
-    body.addColorStop(0, '#ff8a7a');
-    body.addColorStop(0.45, '#d9262b');
-    body.addColorStop(1, '#6e0a10');
-  }
+  const cx = 128;
+  const cy = 116;
+  const r = 88;
+  ctx.beginPath();
+  ctx.moveTo(cx, PIN_CANVAS.tipY);
+  ctx.bezierCurveTo(cx - 28, 268, cx - r, 208, cx - r, cy);
+  ctx.arc(cx, cy, r, Math.PI, 0);
+  ctx.bezierCurveTo(cx + r, 208, cx + 28, 268, cx, PIN_CANVAS.tipY);
+  ctx.closePath();
+  const body = ctx.createLinearGradient(0, cy - r, 0, PIN_CANVAS.tipY);
+  body.addColorStop(0, '#d1202b');
+  body.addColorStop(1, '#a20f19');
   ctx.fillStyle = body;
   ctx.fill();
-  ctx.restore();
 
-  outline();
-  ctx.lineWidth = 5;
-  ctx.strokeStyle = home ? 'rgba(255, 246, 214, 0.95)' : 'rgba(255, 255, 255, 0.92)';
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(cx, cy, 25, 0, Math.PI * 2);
-  ctx.fillStyle = home ? '#1a0a0d' : '#ffffff';
-  ctx.fill();
-
-  ctx.fillStyle = home ? '#f3d27a' : '#a3121a';
-  ctx.font = `800 ${count >= 5 ? 26 : 32}px system-ui, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(count >= 5 ? '5+' : String(count), cx, cy + 2);
-
-  // Specular highlight on the upper-left of the head.
-  ctx.beginPath();
-  ctx.ellipse(cx - 19, cy - 24, 13, 7, -0.6, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-  ctx.fill();
+  if (logo) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, home ? r - 6 : r - 10, 0, Math.PI * 2);
+    ctx.clip();
+    if (home) {
+      const d = (r - 6) * 2;
+      ctx.drawImage(logo, cx - d / 2, cy - d / 2, d, d);
+    } else {
+      const h = r * 1.62;
+      const w = (h * logo.naturalWidth) / logo.naturalHeight;
+      ctx.drawImage(logo, cx - w / 2, cy - h / 2 + 4, w, h);
+    }
+    ctx.restore();
+  }
   return canvas;
 }
+
+const loadImage = (src: string) =>
+  new Promise<HTMLImageElement | null>((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
 
 const VERTEX = /* glsl */ `
   varying vec2 vUv;
@@ -323,10 +331,14 @@ export default function PhilippinesGlobe() {
 
       let day: InstanceType<typeof THREE.Texture>;
       let patch: InstanceType<typeof THREE.Texture>;
+      let emblem: HTMLImageElement | null;
+      let chapterLogo: HTMLImageElement | null;
       try {
-        [day, patch] = await Promise.all([
+        [day, patch, emblem, chapterLogo] = await Promise.all([
           loadTexture('/images/earth-bluemarble.jpg'),
           loadTexture('/images/earth-ph-hires.jpg'),
+          loadImage('/images/demolay-emblem.png'),
+          loadImage('/logo.png'),
         ]);
       } catch {
         renderer.dispose();
@@ -377,22 +389,27 @@ export default function PhilippinesGlobe() {
       });
       scene.add(new THREE.Mesh(atmoGeo, atmoMat));
 
-      // Chapter pins: billboarded map-pin sprites (tip on the surface), sized by chapters per province.
-      const pinTextures = new Map<string, InstanceType<typeof THREE.CanvasTexture>>();
-      const pinTexture = (count: number, home: boolean) => {
-        const key = `${count}-${home}`;
-        let tex = pinTextures.get(key);
-        if (!tex) {
-          tex = new THREE.CanvasTexture(drawPin(count, home));
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.anisotropy = maxAniso;
-          pinTextures.set(key, tex);
-        }
+      // Chapter pins: billboarded map-pin sprites with their tip on the surface. Two textures are shared:
+      // the DeMolay emblem pin, and the chapter-logo pin for home.
+      const makePinTexture = (logo: HTMLImageElement | null, home: boolean) => {
+        const tex = new THREE.CanvasTexture(drawPin(logo, home));
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = maxAniso;
         return tex;
       };
-      const pins = PH_CHAPTER_PINS.map((chapter, i) => {
+      const pinTextures = { emblem: makePinTexture(emblem, false), home: makePinTexture(chapterLogo, true) };
+
+      // Pop order ripples outward from Ilagan, with jitter so neighbors overlap instead of queueing.
+      const homeVec = toVec(ILAGAN.lat, ILAGAN.lon);
+      const byDistance = PH_CHAPTER_PINS.map((chapter, i) => ({
+        chapter,
+        i,
+        dist: toVec(chapter.lat, chapter.lon).distanceTo(homeVec),
+      })).sort((a, b) => a.dist - b.dist);
+      const pins = byDistance.map(({ chapter, i }, rank) => {
+        const home = Boolean(chapter.home);
         const material = new THREE.SpriteMaterial({
-          map: pinTexture(chapter.count, Boolean(chapter.home)),
+          map: home ? pinTextures.home : pinTextures.emblem,
           depthTest: false,
           depthWrite: false,
           toneMapped: false,
@@ -400,28 +417,20 @@ export default function PhilippinesGlobe() {
         const sprite = new THREE.Sprite(material);
         sprite.center.set(0.5, PIN_TIP_Y);
         sprite.position.copy(toVec(chapter.lat, chapter.lon, 1.0005));
-        // Home pin on top, then smaller pins over bigger ones so none get buried in crowded areas.
-        sprite.renderOrder = chapter.home ? 20 : 10 - chapter.count;
+        sprite.renderOrder = home ? 2 : 1;
+        sprite.scale.set(0, 0, 1);
         globe.add(sprite);
-        const height = chapter.home ? 0.03 : 0.0125 + chapter.count * 0.0028;
-        return { sprite, material, height, delay: 0.25 + i * 0.035, home: Boolean(chapter.home) };
+        const jitter = ((i * 7919) % 97) / 97; // stable pseudo-random 0–1 per pin
+        return {
+          sprite,
+          material,
+          home,
+          height: home ? 0.03 : 0.024,
+          delay: home ? 0 : (rank / byDistance.length) * PIN_CYCLE.popSpread * 0.8 + jitter * PIN_CYCLE.popSpread * 0.2,
+          hideJitter: jitter * 0.18,
+        };
       });
       const homePin = pins.find((pin) => pin.home);
-
-      // Pulsing gold ring around the home pin's tip, lying flat on the surface.
-      const ringGeo = new THREE.RingGeometry(0.006, 0.0078, 64);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: new THREE.Color('#f3d27a'),
-        transparent: true,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        toneMapped: false,
-      });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      const homeSurface = toVec(ILAGAN.lat, ILAGAN.lon, 1.001);
-      ring.position.copy(homeSurface);
-      ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), homeSurface.clone().normalize());
-      globe.add(ring);
 
       const resize = () => {
         const { clientWidth: w, clientHeight: h } = host;
@@ -438,6 +447,7 @@ export default function PhilippinesGlobe() {
       const polar = new THREE.Vector3(0, 1, 0);
       const labelPos = new THREE.Vector3();
       const start = performance.now();
+      let pinStart = -1;
       let frame = 0;
       let visible = false;
 
@@ -449,17 +459,14 @@ export default function PhilippinesGlobe() {
         clouds.rotation.y = t * 0.0035;
         cloudMat.uniforms.uTime.value = t;
 
-        // Pins drop in one after another, with a slight overshoot.
-        const since = reduceMotion ? Infinity : t;
+        // Pins ripple in, hold, then all shrink away together; the loop repeats. Static if motion is reduced.
+        const phase = pinStart < 0 ? -1 : ((performance.now() - pinStart) / 1000) % PIN_CYCLE_LENGTH;
+        let homeScale = 0;
         for (const pin of pins) {
-          const k = Math.min(Math.max((since - pin.delay) / 0.5, 0), 1);
-          const pop = k === 0 ? 0 : 1 + 2.4 * Math.pow(k - 1, 3) + 1.4 * Math.pow(k - 1, 2);
-          pin.sprite.scale.set(pin.height * PIN_ASPECT * pop, pin.height * pop, 1);
+          const k = reduceMotion ? 1 : phase < 0 ? 0 : pinScale(phase, pin.delay, pin.hideJitter);
+          pin.sprite.scale.set(pin.height * PIN_ASPECT * k, pin.height * k, 1);
+          if (pin.home) homeScale = k;
         }
-
-        const pulse = (t * 0.55) % 1;
-        ring.scale.setScalar(1 + pulse * 3.2);
-        ringMat.opacity = (1 - pulse) * 0.9;
 
         renderer.render(scene, camera);
 
@@ -468,7 +475,7 @@ export default function PhilippinesGlobe() {
         label.style.transform = `translate(${((labelPos.x + 1) / 2) * host.clientWidth}px, ${
           ((1 - labelPos.y) / 2) * host.clientHeight
         }px)`;
-        label.style.opacity = '1';
+        label.style.opacity = String(Math.min(homeScale, 1));
       };
 
       const loop = () => {
@@ -478,6 +485,7 @@ export default function PhilippinesGlobe() {
 
       const io = new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
+        if (visible && pinStart < 0) pinStart = performance.now();
         cancelAnimationFrame(frame);
         if (visible) loop();
       });
@@ -496,9 +504,10 @@ export default function PhilippinesGlobe() {
         cancelAnimationFrame(frame);
         io.disconnect();
         ro.disconnect();
-        [earthGeo, cloudGeo, atmoGeo, ringGeo].forEach((g) => g.dispose());
-        [earthMat, cloudMat, atmoMat, ringMat, ...pins.map((pin) => pin.material)].forEach((m) => m.dispose());
-        pinTextures.forEach((tex) => tex.dispose());
+        [earthGeo, cloudGeo, atmoGeo].forEach((g) => g.dispose());
+        [earthMat, cloudMat, atmoMat, ...pins.map((pin) => pin.material)].forEach((m) => m.dispose());
+        pinTextures.emblem.dispose();
+        pinTextures.home.dispose();
         day.dispose();
         patch.dispose();
         renderer.dispose();
@@ -516,7 +525,7 @@ export default function PhilippinesGlobe() {
     <div ref={hostRef} className="absolute inset-0">
       <div
         ref={labelRef}
-        className="pointer-events-none absolute left-0 top-0 z-10 opacity-0 transition-opacity duration-700"
+        className="pointer-events-none absolute left-0 top-0 z-10 opacity-0 "
         aria-hidden
       >
         <div className="-translate-y-[210%] translate-x-5 whitespace-nowrap rounded-full border border-gold/40 bg-black/55 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-gold backdrop-blur-md md:text-[0.68rem]">
