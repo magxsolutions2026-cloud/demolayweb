@@ -2,9 +2,12 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
+import { Orbitron } from 'next/font/google';
 import React, { useState } from 'react';
 import HeroScrollIndicator from '@/components/HeroScrollIndicator';
 import { useJoinUsModal } from './JoinUsModalContext';
+
+const orbitron = Orbitron({ subsets: ['latin'], weight: ['400', '700'] });
 
 export default function InteractiveHeroHUD() {
   const { open: openJoinModal } = useJoinUsModal();
@@ -61,20 +64,20 @@ export default function InteractiveHeroHUD() {
           {/* Eyebrow Label */}
           <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-black/35 px-3 py-1 backdrop-blur-xl">
             <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_8px_#d4af37]" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-gold/90 sm:text-xs">
+            <p className={`${orbitron.className} text-[10px] font-bold uppercase tracking-[0.26em] text-gold/90 sm:text-xs`}>
               Order of DeMolay · Founded 1921
             </p>
           </div>
 
           {/* Luxury Perimeter Heading */}
-          <h1 className="font-serif mt-3 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className={`${orbitron.className} mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl`}>
             T. De Leon <br />
             <span className="bg-gradient-to-r from-gold via-amber-200 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(212,175,55,0.25)]">
               Chapter No. 47
             </span>
           </h1>
 
-          <p className="mt-3 max-w-lg text-sm leading-relaxed text-foreground/75 sm:text-base">
+          <p className={`${orbitron.className} mt-3 max-w-lg text-xs leading-relaxed text-foreground/75 sm:text-sm`}>
             Molding young men into leaders through character, fraternity, and enduring fidelity to sacred ideals.
           </p>
 
