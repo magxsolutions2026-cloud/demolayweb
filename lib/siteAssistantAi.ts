@@ -4,7 +4,32 @@ import { siteAssistantKnowledgeText } from '@/lib/siteAssistant';
 
 /** Groq (free tier, OpenAI-compatible). Set GROQ_API_KEY; GROQ_MODEL is optional. */
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODELS_URL = 'https://api.groq.com/openai/v1/models';
 const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+
+/** Groq retires models over time; when the configured one 404s we pick a live chat model and remember it. */
+const NON_CHAT_MODEL = /whisper|tts|guard|embed|audio|speech|playai|orpheus|distil/i;
+const PREFERRED_MODELS = [/llama.*versatile/i, /llama-4/i, /llama/i, /gpt-oss-120b/i, /gpt-oss/i, /qwen/i];
+let fallbackModel: string | null = null;
+
+async function pickAvailableModel(apiKey: string): Promise<string | null> {
+  try {
+    const response = await fetch(GROQ_MODELS_URL, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) return null;
+    const { data } = (await response.json()) as { data?: { id: string; active?: boolean }[] };
+    const ids = (data || []).filter((m) => m.active !== false && !NON_CHAT_MODEL.test(m.id)).map((m) => m.id);
+    for (const preferred of PREFERRED_MODELS) {
+      const match = ids.find((id) => preferred.test(id));
+      if (match) return match;
+    }
+    return ids[0] ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export type AssistantTurn = { role: 'user' | 'assistant'; content: string };
 
@@ -68,6 +93,13 @@ ${siteAssistantKnowledgeText()}
 ${await liveChapterContext()}`;
 }
 
+/** Reasoning models need room to think and must not stream their thinking as the answer. */
+function reasoningOptions(model: string) {
+  if (/gpt-oss/i.test(model)) return { max_tokens: 1200, reasoning_effort: 'low' };
+  if (/qwen/i.test(model)) return { max_tokens: 1200, reasoning_format: 'hidden' };
+  return { max_tokens: 500 };
+}
+
 /**
  * Streams Sir Knight's reply text from Groq. Returns null when AI is unavailable (no key, rate limit,
  * network or API error) so the caller can fall back to the built-in answers.
@@ -76,20 +108,27 @@ export async function streamAssistantReply(history: AssistantTurn[]): Promise<Re
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return null;
 
-  let response: Response;
-  try {
-    response = await fetch(GROQ_URL, {
+  const messages = [{ role: 'system', content: await systemPrompt() }, ...history];
+  const request = (model: string) =>
+    fetch(GROQ_URL, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: process.env.GROQ_MODEL || DEFAULT_MODEL,
-        messages: [{ role: 'system', content: await systemPrompt() }, ...history],
-        stream: true,
-        temperature: 0.4,
-        max_tokens: 500,
-      }),
+      body: JSON.stringify({ model, messages, stream: true, temperature: 0.4, ...reasoningOptions(model) }),
       signal: AbortSignal.timeout(20_000),
     });
+
+  let response: Response;
+  try {
+    const model = fallbackModel || process.env.GROQ_MODEL || DEFAULT_MODEL;
+    response = await request(model);
+    if (response.status === 404) {
+      const available = await pickAvailableModel(apiKey);
+      if (available && available !== model) {
+        console.warn(`[assistant] Groq model "${model}" unavailable, using "${available}"`);
+        fallbackModel = available;
+        response = await request(available);
+      }
+    }
   } catch {
     return null;
   }
