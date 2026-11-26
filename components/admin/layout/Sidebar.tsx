@@ -6,22 +6,18 @@ import {
   CalendarDays,
   LayoutDashboard,
   Mail,
-  Moon,
   Newspaper,
   PanelLeftClose,
   PanelLeftOpen,
   Settings2,
   ShieldCheck,
-  Sun,
   UserRoundCheck,
   UsersRound,
   Wallet,
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { useSyncExternalStore } from 'react';
 import type { LandingSection } from '@/components/admin/types';
-import { applyThemeMode, THEME_CHANGE_EVENT, type ThemeMode } from '@/lib/themeMode';
 
 export type NavGroupId = 'OVERVIEW' | 'OPERATIONS' | 'MANAGEMENT' | 'SYSTEM';
 
@@ -48,20 +44,6 @@ export const navIconFor: Record<LandingSection, LucideIcon> = {
 
 const GROUP_ORDER: NavGroupId[] = ['OVERVIEW', 'OPERATIONS', 'MANAGEMENT', 'SYSTEM'];
 
-function subscribeTheme(onChange: () => void) {
-  window.addEventListener(THEME_CHANGE_EVENT, onChange);
-  return () => window.removeEventListener(THEME_CHANGE_EVENT, onChange);
-}
-
-function getThemeSnapshot(): ThemeMode {
-  const value = document.documentElement.getAttribute('data-theme');
-  return value === 'light' || value === 'dark' ? value : 'dark';
-}
-
-function getServerThemeSnapshot(): ThemeMode {
-  return 'dark';
-}
-
 function SidebarBody({
   items,
   active,
@@ -87,7 +69,6 @@ function SidebarBody({
   logoUrl?: string | null;
   username: string;
 }) {
-  const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
   const initial = username.trim().charAt(0).toUpperCase() || 'A';
 
   const handleSelect = (id: LandingSection) => {
@@ -243,15 +224,6 @@ function SidebarBody({
         </div>
 
         <div className={`mt-2 flex items-center ${compact ? 'flex-col gap-2' : 'justify-between gap-2'}`}>
-          <button
-            type="button"
-            onClick={() => applyThemeMode(theme === 'dark' ? 'light' : 'dark')}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 text-white/50 transition hover:border-gold/30 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold/60"
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
           <button
             type="button"
             onClick={() => handleSelect('settings')}

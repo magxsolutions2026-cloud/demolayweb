@@ -20,7 +20,6 @@ import { AdminPagination } from '@/components/admin/AdminPagination';
 import { AdminSkeleton, TableRowSkeleton } from '@/components/admin/AdminSkeleton';
 import { FundsWorkspace, type FundsTabId } from '@/components/admin/funds/FundsWorkspace';
 import { ToastProvider, useAdminToast } from '@/components/admin/ToastContext';
-import ThemeToggle from '@/components/ThemeToggle';
 import { DataTable, StatusPill, type DataTableStatus } from '@/components/admin/layout/DataTable';
 import { DashboardLayout } from '@/components/admin/layout/DashboardLayout';
 import { StatCard } from '@/components/admin/layout/StatCard';
@@ -1243,17 +1242,6 @@ function DashboardInner({
               onRangeChange={setDateRange}
             />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-              <section className="admin-panel rounded-2xl p-5 lg:col-span-2">
-                <p className="text-sm font-semibold text-white/90">Appearance</p>
-                <p className="mt-1 text-xs text-white/40">Switch between the dark operational theme and the light parity theme.</p>
-                <div className="mt-5 flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.025] p-4">
-                  <ThemeToggle />
-                  <div>
-                    <p className="text-sm font-medium text-white/75">Theme mode</p>
-                    <p className="text-[11px] text-white/35">Applies across the public site and admin workspace.</p>
-                  </div>
-                </div>
-              </section>
               <section className="admin-panel rounded-2xl p-5">
                 <p className="text-sm font-semibold text-white/90">Service health</p>
                 <p className="mt-1 text-xs text-white/40">Current admin workspace status.</p>

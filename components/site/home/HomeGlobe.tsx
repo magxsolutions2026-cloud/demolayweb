@@ -12,9 +12,8 @@ export default function HomeGlobe() {
               Philippine Jurisdiction · Supreme Council
             </p>
             <h2 id="worldwide-heading" className="font-serif mt-4 text-3xl font-bold leading-tight text-foreground md:text-5xl">
-              DeMolay in the Philippines,
+              DeMolay in the Philippines
             </h2>
-            <p className="font-serif text-2xl leading-tight text-foreground/50 md:text-4xl">seen from orbit.</p>
           </div>
 
           <div className="orbit-window-frame relative z-10 mt-8 w-full md:mt-12">

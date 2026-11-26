@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Orbitron } from 'next/font/google';
 import { useEffect, useState } from 'react';
 import AdminModal from './AdminModal';
-import ThemeToggle from './ThemeToggle';
 import SiteFrame from './site/SiteFrame';
 import { useJoinUsModal } from './site/JoinUsModalContext';
 
@@ -88,9 +87,6 @@ export default function Navbar() {
             </button>
             <div className="hidden lg:block">
               <AdminModal variant="avatar" />
-            </div>
-            <div className="[&_button]:text-gold [&_button:hover]:text-amber-200">
-              <ThemeToggle bare />
             </div>
             <button
               type="button"

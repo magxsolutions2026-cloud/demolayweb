@@ -9,19 +9,16 @@ import {
   LogOut,
   Mail,
   Menu,
-  Moon,
   Plus,
   RefreshCw,
   Search,
-  Sun,
   User,
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { LandingSection } from '@/components/admin/types';
 import { formatRelativeTime } from '@/lib/formatRelativeTime';
-import { applyThemeMode, THEME_CHANGE_EVENT, type ThemeMode } from '@/lib/themeMode';
 import type { AppNavItem } from './Sidebar';
 
 export type PetitionerNotifPreview = { id: number; name: string; submittedAt: string; read: boolean };
@@ -35,20 +32,6 @@ export type TShirtOrderNotifPreview = {
   createdAt: string;
   read: boolean;
 };
-
-function subscribeTheme(onChange: () => void) {
-  window.addEventListener(THEME_CHANGE_EVENT, onChange);
-  return () => window.removeEventListener(THEME_CHANGE_EVENT, onChange);
-}
-
-function getThemeSnapshot(): ThemeMode {
-  const value = document.documentElement.getAttribute('data-theme');
-  return value === 'light' || value === 'dark' ? value : 'dark';
-}
-
-function getServerThemeSnapshot(): ThemeMode {
-  return 'dark';
-}
 
 type CommandItem = {
   id: string;
@@ -102,7 +85,6 @@ export function Topbar({
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const controlsRef = useRef<HTMLDivElement>(null);
-  const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
   const initial = username.trim().charAt(0).toUpperCase() || 'A';
 
   const commands = useMemo<CommandItem[]>(() => {
@@ -425,14 +407,6 @@ export function Topbar({
                     <span className="block text-[10px] uppercase tracking-[0.14em] text-white/35">Administrator</span>
                   </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => applyThemeMode(theme === 'dark' ? 'light' : 'dark')}
-                  className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-white/60 transition hover:bg-white/5 hover:text-gold"
-                >
-                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                  {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-                </button>
                 <button
                   type="button"
                   onClick={() => {

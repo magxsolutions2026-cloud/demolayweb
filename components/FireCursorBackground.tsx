@@ -177,15 +177,11 @@ export default function FireCursorBackground() {
       window.addEventListener('mouseleave', onLeave);
     }
 
-    function themeMul() {
-      return document.documentElement.getAttribute('data-theme') === 'light' ? 0.38 : 1;
-    }
-
     function frame(now: number) {
       const dt = lastTs ? Math.min(0.05, (now - lastTs) / 1000) : 1 / 60;
       lastTs = now;
 
-      const tm = themeMul();
+      const tm = 1;
       const idleFactor = ambientMode ? 0 : Math.min(1, (now - lastMove) / IDLE_MS);
       const activeBoost = ambientMode ? 0.42 + Math.sin(now * 0.00055) * 0.06 : 1 - idleFactor * idleFactor;
 
