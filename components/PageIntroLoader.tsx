@@ -81,7 +81,6 @@ export default function PageIntroLoader() {
 
   const ready = phase !== 'loading';
   const label = ready ? 'Ready' : STAGES[stage];
-  const level = ready ? STAGES.length : stage + 1;
 
   return (
     <div
@@ -105,13 +104,6 @@ export default function PageIntroLoader() {
               {label}
             </span>
           </p>
-          <span
-            className={`shrink-0 border px-2 py-0.5 font-mono text-[0.65rem] tracking-[0.18em] ${
-              ready ? 'border-[#ff3b4e] bg-[#ff3b4e] text-[#07060a]' : 'border-[#ff3b4e]/70 text-[#ff5a68]'
-            }`}
-          >
-            LV.{String(level).padStart(2, '0')}
-          </span>
         </div>
 
         <div className="mt-4 flex justify-between font-mono text-[0.62rem] uppercase tracking-[0.24em] text-[#e9dcc4]/55">
