@@ -1,17 +1,5 @@
 import type { AdminAccountStatus } from '@/lib/adminAccountConfig';
 
-export type LandingSection =
-  | 'overview'
-  | 'funds'
-  | 'events'
-  | 'officers'
-  | 'news'
-  | 'sirKnights'
-  | 'petitioners'
-  | 'subscribers'
-  | 'accounts'
-  | 'settings';
-
 export type EventCategory = 'important' | 'formal' | 'activity';
 
 export interface EventItem {
@@ -95,16 +83,3 @@ export interface LandingData {
   hero?: { title?: string; subtitle?: string; cta?: string; /** Public URL, e.g. /uploads/… */ logo_url?: string };
   about?: { text?: string };
 }
-
-export interface NavItem {
-  id: LandingSection;
-  label: string;
-}
-
-export interface NavGroup {
-  id: 'chapterMembers';
-  label: string;
-  children: NavItem[];
-}
-
-export type NavSection = NavItem | NavGroup;

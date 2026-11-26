@@ -18,7 +18,6 @@ import {
   Target,
   Trash2,
   TrendingUp,
-  Wallet,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import NewsImageGallery from '@/components/site/NewsImageGallery';
@@ -29,9 +28,9 @@ import { AdminGhostButton, AdminPrimaryButton } from '@/components/admin/AdminBu
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
 import { DashboardModal } from '@/components/admin/DashboardModal';
 import { AdminField, adminInputClass } from '@/components/admin/AdminFormFields';
-import { AdminBrandMark } from '@/components/admin/AdminBrandMark';
 import { AdminEmptyState } from '@/components/admin/AdminEmptyState';
 import { AdminPagination } from '@/components/admin/AdminPagination';
+import { PageHeader } from '@/components/admin/ui/PageHeader';
 import type { MonthlyPoint, TypeSlice, CategorySlice } from '@/components/admin/funds/FundsCharts';
 import { useCountUp } from '@/components/admin/funds/useCountUp';
 
@@ -811,50 +810,28 @@ export function FundsWorkspace({
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="border-gold/20 from-gold/[0.06] flex flex-col gap-3 rounded-2xl border bg-gradient-to-r to-transparent px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4"
-      >
-        <div className="flex min-w-0 items-center gap-3">
-          {logoUrl?.trim() ? (
-            <AdminBrandMark logoUrl={logoUrl} fallbackSrc="/logo.png" alt={chapterName || 'Chapter'} size="lg" />
-          ) : (
-            <div className="bg-gold/15 text-gold flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-gold/25">
-              <Wallet className="h-6 w-6" />
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="text-gold/85 text-[10px] font-bold uppercase tracking-[0.2em]">Chapter funds</p>
-            {chapterName?.trim() ? (
-              <p className="text-gold/95 truncate text-sm font-semibold md:text-base">{chapterName}</p>
-            ) : null}
-            <p className="text-foreground/75 text-sm font-medium">Transparency · fundraising · disbursements</p>
-          </div>
-        </div>
-        <nav aria-label="Funds sections" className="flex flex-wrap gap-1.5 sm:justify-end">
-          {TABS.map((t) => {
-            const Icon = t.icon;
-            const on = tab === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                aria-current={on ? 'page' : undefined}
-                className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0a10] ${
-                  on
-                    ? 'border-gold/35 bg-gold/20 text-gold shadow-[0_0_20px_rgba(212,175,55,0.12)]'
-                    : 'border-transparent text-foreground/65 hover:bg-white/6'
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5 opacity-90" aria-hidden />
-                {t.label}
-              </button>
-            );
-          })}
-        </nav>
-      </motion.div>
+      <PageHeader
+        kicker={chapterName?.trim() ? `Finance · ${chapterName}` : 'Finance'}
+        title="Chapter funds"
+        lead="Fund sources, disbursements, campaigns and T-shirt orders, with printable reports."
+      />
+      <nav aria-label="Funds sections" className="cs-tabs -mt-2">
+        {TABS.map((t) => {
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              className="cs-tab-btn"
+              onClick={() => setTab(t.id)}
+              aria-current={tab === t.id ? 'page' : undefined}
+            >
+              <Icon aria-hidden />
+              {t.label}
+            </button>
+          );
+        })}
+      </nav>
 
       <AnimatePresence mode="wait">
         {tab === 'dashboard' && (

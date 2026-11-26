@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Pencil, Plus, Search, ShieldUser, Trash2 } from 'lucide-react';
+import { Download, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import {
   ADMIN_ACCOUNT_STATUSES,
   DEFAULT_ADMIN_ACCOUNT_STATUS,
@@ -11,6 +11,8 @@ import {
 import { isValidEmail, validatePasswordRule } from '@/lib/validation';
 import type { AdminUserItem } from '@/components/admin/types';
 import { AdminBadge } from '@/components/admin/AdminBadge';
+import { PageHeader } from '@/components/admin/ui/PageHeader';
+import { StatusChip } from '@/components/admin/ui/StatusChip';
 import { AdminGhostButton, AdminPrimaryButton } from '@/components/admin/AdminButtons';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
 import { DashboardModal } from '@/components/admin/DashboardModal';
@@ -278,47 +280,27 @@ export function AdminAccountsWorkspace({
   const rangeEnd = Math.min(page * pageSize, filteredAdmins.length);
 
   return (
-    <div className="space-y-6">
-      <section className="admin-data-shell relative overflow-hidden rounded-[28px] px-5 py-5 md:px-6 md:py-6">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-80"
-          aria-hidden
-          style={{
-            background:
-              'radial-gradient(circle at top right, rgba(212, 175, 55, 0.16), transparent 34%), radial-gradient(circle at bottom left, rgba(115, 14, 27, 0.18), transparent 40%)',
-          }}
-        />
-        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <span className="border-gold/20 bg-gold/10 text-gold inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
-              <ShieldUser className="h-3.5 w-3.5" aria-hidden />
-              Administration
-            </span>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight text-white md:text-3xl">Account Management</h2>
-            <p className="text-foreground/65 mt-2 text-sm md:text-base">Manage administrator accounts</p>
-          </div>
-
+    <div>
+      <PageHeader
+        kicker="System"
+        title="Accounts"
+        lead="Who can sign in to this console. Inactive accounts cannot log in."
+        meta={
+          <>
+            <StatusChip>{admins.length} admins</StatusChip>
+            <StatusChip tone="green">{activeCount} active</StatusChip>
+            <StatusChip tone="muted">{inactiveCount} inactive</StatusChip>
+          </>
+        }
+        actions={
           <AdminPrimaryButton type="button" onClick={openCreate}>
-            <Plus className="h-4 w-4" aria-hidden />
-            Add Admin
+            <Plus aria-hidden />
+            New admin
           </AdminPrimaryButton>
-        </div>
+        }
+      />
 
-        <div className="relative mt-6 grid gap-3 sm:grid-cols-3">
-          {[
-            { label: 'Total Admins', value: admins.length },
-            { label: 'Active Accounts', value: activeCount },
-            { label: 'Inactive Accounts', value: inactiveCount },
-          ].map((item) => (
-            <div key={item.label} className="rounded-2xl border border-gold/15 bg-black/25 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-              <p className="text-foreground/55 text-xs font-medium uppercase tracking-[0.18em]">{item.label}</p>
-              <p className="mt-3 text-2xl font-semibold text-white">{item.value}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="admin-data-shell rounded-[28px] p-4 md:p-5">
+      <section className="cs-tile mb-[14px] rounded-[20px] p-4 md:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-md">
             <Search className="text-foreground/40 pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2" aria-hidden />
@@ -359,7 +341,7 @@ export function AdminAccountsWorkspace({
         </div>
       </section>
 
-      <section className="admin-data-shell overflow-hidden rounded-[28px]">
+      <section className="cs-tile overflow-hidden rounded-[20px]">
         <div className="border-b border-gold/10 px-4 py-4 md:px-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
